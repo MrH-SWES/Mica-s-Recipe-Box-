@@ -8,16 +8,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Special+Elite&family=Patrick+Hand+SC&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bakelite-yellow: #FBBC12;
-      --bakelite-dark: #D4920A;
-      --bakelite-light: #FFD54F;
+      --box-yellow: #F5B800;
+      --box-yellow-light: #FFCE3A;
+      --box-yellow-dark: #D19E00;
+      --lid-cream: #FFF8E8;
+      --lid-cream-dark: #F0E6D3;
       --card-white: #FFFEF9;
-      --card-aged: #F5F0E1;
       --line-blue: #B8D4E8;
       --line-pink: #E8A5A5;
       --ink-color: #3D3D3D;
-      --countertop: #E0F2F1;
-      --countertop-dots: #B2DFDB;
+      --countertop: #D7E8E8;
+      --countertop-pattern: #C5DADA;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,188 +26,170 @@
     body {
       font-family: 'Special Elite', monospace;
       background-color: var(--countertop);
-      background-image: 
-        radial-gradient(var(--countertop-dots) 15%, transparent 16%),
-        radial-gradient(var(--countertop-dots) 15%, transparent 16%);
-      background-size: 20px 20px;
-      background-position: 0 0, 10px 10px;
+      background-image: radial-gradient(var(--countertop-pattern) 1px, transparent 1px);
+      background-size: 8px 8px;
       min-height: 100vh;
-      min-height: -webkit-fill-available;
+      min-height: 100dvh;
       color: var(--ink-color);
       overflow: hidden;
       user-select: none;
-      -webkit-user-select: none;
     }
 
-    /* Header */
     .main-header {
       text-align: center;
-      padding: 1rem 1rem 0.5rem;
+      padding: 0.75rem 1rem 0.5rem;
     }
 
     h1 {
       font-family: 'Lobster', cursive;
-      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-size: clamp(1.8rem, 7vw, 2.8rem);
       color: #C62828;
-      text-shadow: 2px 2px 0 rgba(255,255,255,0.7), 3px 3px 0 rgba(0,0,0,0.1);
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.8), 3px 3px 0 rgba(0,0,0,0.1);
       transform: rotate(-2deg);
     }
 
     .subtitle {
       font-family: 'Patrick Hand SC', cursive;
-      font-size: clamp(0.8rem, 3vw, 1.1rem);
+      font-size: clamp(0.7rem, 2.5vw, 0.95rem);
       color: #666;
       letter-spacing: 2px;
     }
 
-    /* Main Container */
-    .box-container {
-      position: relative;
-      width: 100%;
-      max-width: 500px;
-      height: calc(100vh - 120px);
-      height: calc(100dvh - 120px);
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Filter Tags */
     .filter-bar {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 6px;
-      padding: 0.5rem 1rem;
-      z-index: 5;
+      gap: 5px;
+      padding: 0.4rem 0.75rem;
     }
 
     .tag-tab {
       background: #FFF;
-      padding: 4px 10px;
-      font-size: 0.7rem;
+      padding: 3px 8px;
+      font-size: 0.65rem;
       border: 1px solid #DDD;
       border-radius: 2px;
       cursor: pointer;
       transform: rotate(-1deg);
-      box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
-      transition: all 0.15s;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
     .tag-tab:nth-child(even) { transform: rotate(1deg); }
     .tag-tab.active {
       background: #FFF59D;
       border-color: #FBC02D;
-      transform: rotate(0deg) scale(1.05);
+      transform: scale(1.05);
     }
 
-    /* The Recipe Box Scene */
-    .recipe-box-scene {
+    .recipe-box-wrapper {
       position: relative;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 1rem;
-      overflow: hidden;
+      width: 95%;
+      max-width: 420px;
+      margin: 0.5rem auto 0;
+      height: calc(100vh - 130px);
+      height: calc(100dvh - 130px);
     }
 
-    /* Cards Container - sits above the box front */
-    .cards-container {
-      position: relative;
+    /* Open lid behind cards */
+    .box-lid {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 105%;
       height: 55%;
-      min-height: 280px;
+      background: linear-gradient(170deg, var(--lid-cream) 0%, var(--lid-cream-dark) 100%);
+      border-radius: 8px 8px 0 0;
+      border: 4px solid var(--box-yellow);
+      border-bottom: none;
+      box-shadow: inset 0 5px 15px rgba(0,0,0,0.05), inset 0 -3px 10px rgba(0,0,0,0.03);
+      z-index: 1;
+    }
+
+    .box-lid::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 8px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+    }
+
+    .cards-container {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      height: 55%;
       display: flex;
       justify-content: center;
-      align-items: flex-end;
       z-index: 10;
+      perspective: 600px;
     }
 
-    /* Individual Recipe Card */
     .recipe-card {
       position: absolute;
-      width: 92%;
-      max-width: 380px;
-      height: 260px;
+      width: 100%;
+      max-width: 340px;
+      height: 220px;
       background: var(--card-white);
       border-radius: 3px;
       cursor: pointer;
       transform-origin: center bottom;
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                  opacity 0.35s ease,
-                  box-shadow 0.35s ease;
-      
-      /* Index card lines */
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       background-image: 
         linear-gradient(var(--line-pink) 0%, var(--line-pink) 100%),
-        repeating-linear-gradient(
-          to bottom,
-          transparent,
-          transparent 23px,
-          var(--line-blue) 23px,
-          var(--line-blue) 24px
-        );
-      background-size: 2px 100%, 100% 24px;
-      background-position: 32px 0, 0 36px;
+        repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--line-blue) 21px, var(--line-blue) 22px);
+      background-size: 2px 100%, 100% 22px;
+      background-position: 28px 0, 0 32px;
       background-repeat: no-repeat, repeat;
-      
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
 
-    /* Card positions - fanned out showing tops */
     .recipe-card[data-pos="0"] {
       z-index: 20;
-      transform: translateY(0) rotate(0deg);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transform: rotateX(8deg) translateZ(0);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
     .recipe-card[data-pos="1"] {
-      z-index: 19;
-      transform: translateY(-30px) rotate(-3deg) translateX(-8px);
-      opacity: 0.95;
+      z-index: 15;
+      transform: rotateX(12deg) translateY(-12px) translateZ(-20px);
+      opacity: 0.9;
     }
 
     .recipe-card[data-pos="2"] {
-      z-index: 18;
-      transform: translateY(-55px) rotate(-5deg) translateX(-12px);
-      opacity: 0.85;
+      z-index: 14;
+      transform: rotateX(15deg) translateY(-22px) translateZ(-40px);
+      opacity: 0.75;
     }
 
     .recipe-card[data-pos="3"] {
-      z-index: 17;
-      transform: translateY(-75px) rotate(-6deg) translateX(-14px);
-      opacity: 0.7;
+      z-index: 13;
+      transform: rotateX(17deg) translateY(-30px) translateZ(-60px);
+      opacity: 0.55;
     }
 
-    .recipe-card[data-pos="-1"] {
-      z-index: 19;
-      transform: translateY(-30px) rotate(3deg) translateX(8px);
-      opacity: 0.95;
-    }
-
-    .recipe-card[data-pos="-2"] {
-      z-index: 18;
-      transform: translateY(-55px) rotate(5deg) translateX(12px);
-      opacity: 0.85;
+    .recipe-card[data-pos="4"] {
+      z-index: 12;
+      transform: rotateX(18deg) translateY(-36px) translateZ(-80px);
+      opacity: 0.35;
     }
 
     .recipe-card[data-pos="hidden"] {
       z-index: 1;
-      transform: translateY(-80px) scale(0.9);
+      transform: rotateX(20deg) translateY(-40px) translateZ(-100px);
       opacity: 0;
       pointer-events: none;
     }
 
-    /* Card top edge - clickable tab area */
     .card-tab {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 40px;
-      background: linear-gradient(to bottom, 
-        rgba(255,255,255,0.9) 0%, 
-        rgba(255,255,255,0.3) 100%);
+      top: 0; left: 0; right: 0;
+      height: 34px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 100%);
       border-bottom: 1px dashed rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
@@ -216,426 +199,197 @@
 
     .card-tab-title {
       font-family: 'Patrick Hand SC', cursive;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #555;
-      text-align: center;
-      padding: 0 10px;
+      padding: 0 8px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 90%;
+      max-width: 95%;
     }
 
-    /* Card content */
     .card-content {
-      padding: 50px 16px 16px 44px;
+      padding: 40px 14px 14px 38px;
       height: 100%;
       overflow: hidden;
     }
 
-    .card-title {
-      font-family: 'Special Elite', monospace;
-      font-size: 1.2rem;
-      color: #333;
-      line-height: 24px;
-      margin-bottom: 4px;
-    }
+    .card-title { font-size: 1.05rem; color: #333; line-height: 22px; margin-bottom: 2px; }
+    .card-meta { font-size: 0.7rem; color: #888; font-style: italic; margin-bottom: 6px; }
+    .card-preview { font-size: 0.75rem; line-height: 22px; color: #555; }
 
-    .card-meta {
-      font-size: 0.75rem;
-      color: #888;
-      font-style: italic;
-      margin-bottom: 8px;
-      line-height: 24px;
-    }
-
-    .card-preview {
-      font-size: 0.8rem;
-      line-height: 24px;
-      color: #555;
-    }
-
-    /* Animation for flipping forward */
-    .recipe-card.flip-forward {
-      animation: flipForward 0.4s ease-in-out;
-    }
-
-    @keyframes flipForward {
-      0% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-40px) rotate(-15deg) translateX(-30px); z-index: 25; }
-      100% { transform: translateY(-30px) rotate(-3deg) translateX(-8px); }
-    }
-
-    /* Animation for flipping backward */
-    .recipe-card.flip-backward {
-      animation: flipBackward 0.4s ease-in-out;
-    }
-
-    @keyframes flipBackward {
-      0% { transform: translateY(-30px) rotate(3deg) translateX(8px); }
-      50% { transform: translateY(-40px) rotate(15deg) translateX(30px); z-index: 25; }
-      100% { transform: translateY(0) rotate(0deg); }
-    }
-
-    /* The Yellow Box - Front Face */
+    /* Yellow box front */
     .box-front {
-      position: relative;
-      width: 100%;
-      height: 45%;
-      min-height: 180px;
-      background: linear-gradient(
-        180deg,
-        var(--bakelite-light) 0%,
-        var(--bakelite-yellow) 15%,
-        var(--bakelite-yellow) 85%,
-        var(--bakelite-dark) 100%
-      );
-      border-radius: 5px 5px 20px 20px;
-      box-shadow: 
-        inset 0 2px 4px rgba(255,255,255,0.5),
-        inset 0 -8px 20px rgba(0,0,0,0.1),
-        0 10px 30px rgba(0,0,0,0.3);
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 108%;
+      height: 48%;
+      background: linear-gradient(180deg, var(--box-yellow-light) 0%, var(--box-yellow) 8%, var(--box-yellow) 90%, var(--box-yellow-dark) 100%);
+      border-radius: 6px 6px 16px 16px;
+      box-shadow: inset 0 2px 3px rgba(255,255,255,0.4), inset 0 -6px 15px rgba(0,0,0,0.08), 0 8px 25px rgba(0,0,0,0.25);
+      z-index: 25;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 15;
-      margin-top: -20px;
+      overflow: hidden;
     }
 
-    /* Floral Decal */
-    .floral-decal {
-      width: 50%;
-      max-width: 180px;
-      opacity: 0.85;
+    .daisy-pattern {
+      position: absolute;
+      width: 70%;
+      max-width: 220px;
+      height: auto;
+      opacity: 0.9;
     }
 
-    .floral-decal path,
-    .floral-decal circle,
-    .floral-decal ellipse {
-      fill: rgba(255,255,240,0.9);
-    }
-
-    /* Control Buttons */
     .controls {
       position: absolute;
-      bottom: 15px;
-      left: 0;
-      right: 0;
+      bottom: 12px;
+      left: 0; right: 0;
       display: flex;
       justify-content: space-around;
-      padding: 0 30px;
+      padding: 0 20px;
+      z-index: 30;
     }
 
     .ctrl-btn {
-      width: 50px;
-      height: 50px;
+      width: 46px; height: 46px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
-      transition: transform 0.1s, box-shadow 0.1s;
-      
-      background: linear-gradient(145deg, #E0E0E0, #BDBDBD);
-      box-shadow: 
-        3px 3px 6px rgba(0,0,0,0.2),
-        -2px -2px 4px rgba(255,255,255,0.7),
-        inset 1px 1px 2px rgba(255,255,255,0.5);
+      font-size: 1.2rem;
+      transition: transform 0.1s;
+      background: linear-gradient(145deg, #E8E8E8, #C8C8C8);
+      box-shadow: 2px 3px 5px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.6);
       color: #5D4037;
     }
 
-    .ctrl-btn:active {
-      transform: scale(0.95);
-      box-shadow: 
-        1px 1px 3px rgba(0,0,0,0.2),
-        inset 2px 2px 4px rgba(0,0,0,0.1);
-    }
-
+    .ctrl-btn:active { transform: scale(0.93); }
     .ctrl-btn.add-btn {
       background: linear-gradient(145deg, #EF5350, #C62828);
       color: white;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
     }
 
-    /* Overlay & Modal */
     .overlay {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(2px);
       z-index: 100;
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0; visibility: hidden;
       transition: opacity 0.3s, visibility 0.3s;
     }
+    .overlay.show { opacity: 1; visibility: visible; }
 
-    .overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* Pulled-out Card Modal */
     .card-modal {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, 100%);
-      width: 92%;
-      max-width: 420px;
-      max-height: 85vh;
+      top: 50%; left: 50%;
+      transform: translate(-50%, 120%);
+      width: 92%; max-width: 400px; max-height: 85vh;
       background: var(--card-white);
       border-radius: 4px;
       z-index: 101;
       overflow-y: auto;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      
-      /* Full card lines */
       background-image: 
         linear-gradient(var(--line-pink) 0%, var(--line-pink) 100%),
-        repeating-linear-gradient(
-          to bottom,
-          transparent,
-          transparent 23px,
-          var(--line-blue) 23px,
-          var(--line-blue) 24px
-        );
-      background-size: 2px 100%, 100% 24px;
-      background-position: 32px 0, 0 36px;
+        repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--line-blue) 21px, var(--line-blue) 22px);
+      background-size: 2px 100%, 100% 22px;
+      background-position: 28px 0, 0 32px;
       background-repeat: no-repeat, repeat;
-      
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
     }
+    .card-modal.show { transform: translate(-50%, -50%); }
 
-    .card-modal.show {
-      transform: translate(-50%, -50%);
-    }
-
-    .modal-content {
-      padding: 20px 20px 20px 48px;
-    }
-
+    .modal-content { padding: 18px 18px 18px 42px; }
     .modal-close {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #999;
-      cursor: pointer;
-      z-index: 5;
+      position: absolute; top: 6px; right: 10px;
+      background: none; border: none;
+      font-size: 1.4rem; color: #999; cursor: pointer;
     }
-
-    .modal-title {
-      font-family: 'Special Elite', monospace;
-      font-size: 1.4rem;
-      line-height: 24px;
-      padding-top: 16px;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    .modal-meta {
-      font-size: 0.8rem;
-      color: #888;
-      margin-bottom: 16px;
-      font-style: italic;
-    }
-
-    .modal-section {
-      margin-bottom: 16px;
-    }
-
+    .modal-title { font-size: 1.25rem; line-height: 22px; padding-top: 14px; margin-bottom: 4px; color: #333; }
+    .modal-meta { font-size: 0.75rem; color: #888; margin-bottom: 14px; font-style: italic; }
+    .modal-section { margin-bottom: 12px; }
     .modal-section-title {
       font-family: 'Patrick Hand SC', cursive;
-      font-size: 1rem;
-      color: #C62828;
-      margin-bottom: 6px;
-      text-decoration: underline;
+      font-size: 0.95rem; color: #C62828;
+      margin-bottom: 4px; text-decoration: underline;
     }
-
-    .modal-section ul,
-    .modal-section ol {
-      padding-left: 20px;
-      font-size: 0.85rem;
-      line-height: 24px;
-    }
-
-    .modal-section li {
-      margin-bottom: 2px;
-    }
-
+    .modal-section ul, .modal-section ol { padding-left: 18px; font-size: 0.8rem; line-height: 22px; }
     .modal-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      padding-top: 16px;
-      border-top: 1px dashed #CCC;
-      margin-top: 16px;
+      display: flex; gap: 8px; justify-content: flex-end;
+      padding-top: 12px; border-top: 1px dashed #CCC; margin-top: 12px;
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 6px 14px;
       font-family: 'Special Elite', monospace;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       border: 1px solid #999;
       background: #FFF;
       cursor: pointer;
       border-radius: 2px;
-      transition: background 0.15s;
     }
+    .btn-primary { background: #333; color: #FFF; border-color: #333; }
+    .btn-danger { color: #C62828; border-color: #C62828; }
 
-    .btn:hover { background: #F5F5F5; }
-    .btn-primary {
-      background: #333;
-      color: #FFF;
-      border-color: #333;
-    }
-    .btn-primary:hover { background: #555; }
-    .btn-danger {
-      color: #C62828;
-      border-color: #C62828;
-    }
-
-    /* Add/Edit Form Modal */
     .form-modal {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, 100%);
-      width: 92%;
-      max-width: 420px;
-      max-height: 90vh;
+      top: 50%; left: 50%;
+      transform: translate(-50%, 120%);
+      width: 92%; max-width: 400px; max-height: 90vh;
       background: var(--card-white);
       border-radius: 4px;
       z-index: 102;
       overflow-y: auto;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      
       background-image: 
         linear-gradient(var(--line-pink) 0%, var(--line-pink) 100%),
-        repeating-linear-gradient(
-          to bottom,
-          transparent,
-          transparent 23px,
-          var(--line-blue) 23px,
-          var(--line-blue) 24px
-        );
-      background-size: 2px 100%, 100% 24px;
-      background-position: 32px 0, 0 36px;
+        repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--line-blue) 21px, var(--line-blue) 22px);
+      background-size: 2px 100%, 100% 22px;
+      background-position: 28px 0, 0 32px;
       background-repeat: no-repeat, repeat;
-      
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
     }
+    .form-modal.show { transform: translate(-50%, -50%); }
 
-    .form-modal.show {
-      transform: translate(-50%, -50%);
-    }
-
-    .form-content {
-      padding: 20px 20px 20px 48px;
-    }
-
-    .form-title {
-      font-family: 'Patrick Hand SC', cursive;
-      font-size: 1.3rem;
-      color: #C62828;
-      margin-bottom: 16px;
-      padding-top: 10px;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 0.75rem;
-      color: #666;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
+    .form-content { padding: 18px 18px 18px 42px; }
+    .form-title { font-family: 'Patrick Hand SC', cursive; font-size: 1.2rem; color: #C62828; margin-bottom: 14px; padding-top: 8px; }
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 0.7rem; color: #666; margin-bottom: 3px; text-transform: uppercase; }
     .form-input {
-      width: 100%;
-      padding: 8px;
-      font-family: 'Special Elite', monospace;
-      font-size: 0.9rem;
-      border: none;
-      border-bottom: 2px dashed #CCC;
-      background: transparent;
-      transition: border-color 0.2s;
+      width: 100%; padding: 6px 8px;
+      font-family: 'Special Elite', monospace; font-size: 0.85rem;
+      border: none; border-bottom: 2px dashed #CCC; background: transparent;
     }
-
-    .form-input:focus {
-      outline: none;
-      border-bottom-color: var(--bakelite-yellow);
-    }
-
+    .form-input:focus { outline: none; border-bottom-color: var(--box-yellow); }
     .form-textarea {
-      width: 100%;
-      min-height: 80px;
-      padding: 8px;
-      font-family: 'Special Elite', monospace;
-      font-size: 0.85rem;
-      line-height: 24px;
-      border: 1px dashed #CCC;
-      background: transparent;
-      resize: vertical;
+      width: 100%; min-height: 70px; padding: 6px 8px;
+      font-family: 'Special Elite', monospace; font-size: 0.8rem; line-height: 22px;
+      border: 1px dashed #CCC; background: transparent; resize: vertical;
+    }
+    .form-textarea:focus { outline: none; border-color: var(--box-yellow); }
+    .form-hint { font-size: 0.65rem; color: #999; margin-top: 2px; }
+
+    .empty-state { text-align: center; padding: 30px; color: #888; }
+
+    @media (max-width: 400px) {
+      .recipe-card { height: 200px; }
+      .card-content { padding: 36px 12px 12px 34px; }
+      .card-title { font-size: 0.95rem; }
+      .ctrl-btn { width: 42px; height: 42px; font-size: 1.1rem; }
     }
 
-    .form-textarea:focus {
-      outline: none;
-      border-color: var(--bakelite-yellow);
-    }
-
-    .form-hint {
-      font-size: 0.7rem;
-      color: #999;
-      margin-top: 2px;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #888;
-    }
-
-    .empty-state-icon {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
-
-    /* Mobile Adjustments */
-    @media (max-width: 480px) {
-      .main-header { padding: 0.75rem 0.5rem 0.25rem; }
-      .filter-bar { padding: 0.4rem 0.5rem; gap: 4px; }
-      .tag-tab { padding: 3px 8px; font-size: 0.65rem; }
-      
-      .cards-container { min-height: 240px; height: 50%; }
-      .recipe-card { height: 220px; }
-      .card-content { padding: 45px 12px 12px 38px; }
-      .card-title { font-size: 1.05rem; }
-      .card-preview { font-size: 0.75rem; }
-      
-      .box-front { min-height: 160px; }
-      .ctrl-btn { width: 44px; height: 44px; font-size: 1.1rem; }
-      .ctrl-btn.add-btn { font-size: 1.5rem; }
-    }
-
-    /* Landscape phones */
-    @media (max-height: 500px) {
+    @media (max-height: 600px) {
       .main-header { padding: 0.5rem; }
-      h1 { font-size: 1.8rem; }
-      .subtitle { font-size: 0.7rem; }
-      .cards-container { min-height: 180px; }
+      h1 { font-size: 1.6rem; }
+      .recipe-box-wrapper { height: calc(100vh - 100px); }
       .recipe-card { height: 180px; }
-      .box-front { min-height: 120px; }
     }
   </style>
 </head>
@@ -646,74 +400,68 @@
   <div class="subtitle">FAMILY FAVORITES • EST. 2025</div>
 </header>
 
-<div class="box-container">
-  <div class="filter-bar" id="filterBar"></div>
+<div class="filter-bar" id="filterBar"></div>
+
+<div class="recipe-box-wrapper">
+  <div class="box-lid"></div>
+  <div class="cards-container" id="cardsContainer"></div>
   
-  <div class="recipe-box-scene">
-    <div class="cards-container" id="cardsContainer"></div>
-    
-    <div class="box-front">
-      <svg class="floral-decal" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
-        <g>
-          <!-- Center flower -->
-          <circle cx="100" cy="50" r="10"/>
-          <ellipse cx="100" cy="28" rx="6" ry="14"/>
-          <ellipse cx="100" cy="72" rx="6" ry="14"/>
-          <ellipse cx="78" cy="50" rx="14" ry="6"/>
-          <ellipse cx="122" cy="50" rx="14" ry="6"/>
-          <ellipse cx="85" cy="35" rx="10" ry="5" transform="rotate(-45 85 35)"/>
-          <ellipse cx="115" cy="35" rx="10" ry="5" transform="rotate(45 115 35)"/>
-          <ellipse cx="85" cy="65" rx="10" ry="5" transform="rotate(45 85 65)"/>
-          <ellipse cx="115" cy="65" rx="10" ry="5" transform="rotate(-45 115 65)"/>
-          
-          <!-- Left flower -->
-          <g transform="translate(-50, 5) scale(0.6)">
-            <circle cx="100" cy="50" r="8"/>
-            <ellipse cx="100" cy="32" rx="5" ry="12"/>
-            <ellipse cx="100" cy="68" rx="5" ry="12"/>
-            <ellipse cx="82" cy="50" rx="12" ry="5"/>
-            <ellipse cx="118" cy="50" rx="12" ry="5"/>
-          </g>
-          
-          <!-- Right flower -->
-          <g transform="translate(50, 5) scale(0.6)">
-            <circle cx="100" cy="50" r="8"/>
-            <ellipse cx="100" cy="32" rx="5" ry="12"/>
-            <ellipse cx="100" cy="68" rx="5" ry="12"/>
-            <ellipse cx="82" cy="50" rx="12" ry="5"/>
-            <ellipse cx="118" cy="50" rx="12" ry="5"/>
-          </g>
+  <div class="box-front">
+    <!-- Pyrex-style daisy cluster -->
+    <svg class="daisy-pattern" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <g id="daisy">
+          <ellipse cx="0" cy="-12" rx="4" ry="10" fill="#FFF8E0"/>
+          <ellipse cx="0" cy="12" rx="4" ry="10" fill="#FFF8E0"/>
+          <ellipse cx="-12" cy="0" rx="10" ry="4" fill="#FFF8E0"/>
+          <ellipse cx="12" cy="0" rx="10" ry="4" fill="#FFF8E0"/>
+          <ellipse cx="-8" cy="-8" rx="4" ry="9" transform="rotate(-45 -8 -8)" fill="#FFF8E0"/>
+          <ellipse cx="8" cy="-8" rx="4" ry="9" transform="rotate(45 8 -8)" fill="#FFF8E0"/>
+          <ellipse cx="-8" cy="8" rx="4" ry="9" transform="rotate(45 -8 8)" fill="#FFF8E0"/>
+          <ellipse cx="8" cy="8" rx="4" ry="9" transform="rotate(-45 8 8)" fill="#FFF8E0"/>
+          <circle cx="0" cy="0" r="5" fill="#FFE082"/>
         </g>
-      </svg>
-      
-      <div class="controls">
-        <button class="ctrl-btn" id="prevBtn">◀</button>
-        <button class="ctrl-btn add-btn" id="addBtn">+</button>
-        <button class="ctrl-btn" id="nextBtn">▶</button>
-      </div>
+        <g id="small-daisy">
+          <ellipse cx="0" cy="-8" rx="3" ry="7" fill="#FFF8E0"/>
+          <ellipse cx="0" cy="8" rx="3" ry="7" fill="#FFF8E0"/>
+          <ellipse cx="-8" cy="0" rx="7" ry="3" fill="#FFF8E0"/>
+          <ellipse cx="8" cy="0" rx="7" ry="3" fill="#FFF8E0"/>
+          <circle cx="0" cy="0" r="4" fill="#FFE082"/>
+        </g>
+      </defs>
+      <use href="#daisy" x="100" y="50"/>
+      <use href="#daisy" x="60" y="45" transform="translate(0,0) scale(0.75)"/>
+      <use href="#daisy" x="140" y="45" transform="translate(0,0) scale(0.75)"/>
+      <use href="#small-daisy" x="45" y="60"/>
+      <use href="#small-daisy" x="155" y="60"/>
+      <use href="#small-daisy" x="75" y="70"/>
+      <use href="#small-daisy" x="125" y="70"/>
+      <use href="#small-daisy" x="100" y="78" transform="scale(0.7)"/>
+    </svg>
+    
+    <div class="controls">
+      <button class="ctrl-btn" id="prevBtn">◀</button>
+      <button class="ctrl-btn add-btn" id="addBtn">+</button>
+      <button class="ctrl-btn" id="nextBtn">▶</button>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="overlay"></div>
 
-<!-- View Recipe Modal -->
 <div class="card-modal" id="viewModal">
   <button class="modal-close" id="viewClose">×</button>
   <div class="modal-content">
     <h2 class="modal-title" id="viewTitle"></h2>
     <div class="modal-meta" id="viewMeta"></div>
-    
     <div class="modal-section">
       <div class="modal-section-title">Ingredients</div>
       <ul id="viewIngredients"></ul>
     </div>
-    
     <div class="modal-section">
       <div class="modal-section-title">Instructions</div>
       <ol id="viewInstructions"></ol>
     </div>
-    
     <div class="modal-actions">
       <button class="btn btn-danger" id="viewDelete">Delete</button>
       <button class="btn" id="viewEdit">Edit</button>
@@ -722,139 +470,96 @@
   </div>
 </div>
 
-<!-- Add/Edit Form Modal -->
 <div class="form-modal" id="formModal">
   <div class="form-content">
     <div class="form-title" id="formTitle">New Recipe Card</div>
-    
     <div class="form-group">
       <label class="form-label">Recipe Name</label>
       <input type="text" class="form-input" id="inputName" placeholder="Grandma's Famous...">
     </div>
-    
     <div class="form-group">
       <label class="form-label">Ingredients</label>
-      <textarea class="form-textarea" id="inputIngredients" placeholder="1 cup sugar&#10;2 eggs&#10;..."></textarea>
-      <div class="form-hint">One ingredient per line</div>
+      <textarea class="form-textarea" id="inputIngredients" placeholder="1 cup sugar&#10;2 eggs"></textarea>
+      <div class="form-hint">One per line</div>
     </div>
-    
     <div class="form-group">
       <label class="form-label">Instructions</label>
-      <textarea class="form-textarea" id="inputInstructions" placeholder="1. Preheat oven...&#10;2. Mix ingredients..."></textarea>
+      <textarea class="form-textarea" id="inputInstructions" placeholder="1. Preheat oven..."></textarea>
       <div class="form-hint">One step per line</div>
     </div>
-    
     <div class="form-group">
       <label class="form-label">Tags</label>
       <input type="text" class="form-input" id="inputTags" placeholder="dinner, chicken, easy">
-      <div class="form-hint">Separate with commas</div>
+      <div class="form-hint">Comma separated</div>
     </div>
-    
     <div class="modal-actions">
       <button class="btn" id="formCancel">Cancel</button>
-      <button class="btn btn-primary" id="formSave">Save Card</button>
+      <button class="btn btn-primary" id="formSave">Save</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== DATA ====================
 const defaultRecipes = [
   {
     id: 1,
     title: "PCC Perfect Protein Salad",
     tags: ["salad", "meal-prep", "vegetarian", "healthy"],
-    ingredients: [
-      "1 cup spelt berries",
-      "3 cups water",
-      "2 (14-oz) cans garbanzo beans, drained",
-      "1 English cucumber, peeled, seeded & diced",
-      "1 green bell pepper, diced",
-      "3 ribs celery, diced",
-      "1 carrot, peeled & diced",
-      "¼ red onion, diced",
-      "½ bunch green onions, diagonally sliced",
-      "⅓ bunch parsley, chopped",
-      "½ cup mayonnaise (or vegan mayo)",
-      "2 tbsp lemon juice",
-      "2 tbsp apple cider vinegar",
-      "1 tsp dried dill",
-      "1 tsp salt",
-      "1 tsp dried basil",
-      "1 tsp minced garlic"
-    ],
-    instructions: [
-      "Boil spelt berries in water until tender, about 45 minutes. Drain and cool.",
-      "In a large bowl, mix cooked spelt, garbanzo beans, cucumbers, peppers, celery, carrots, red onions, green onions, and parsley.",
-      "Whisk together mayo, lemon juice, vinegar, dill, salt, basil, and garlic.",
-      "Pour dressing over salad and mix well.",
-      "Refrigerate at least 1 hour before serving. Keeps 5 days."
-    ]
+    ingredients: ["1 cup spelt berries","3 cups water","2 (14-oz) cans garbanzo beans, drained","1 English cucumber, peeled & diced","1 green bell pepper, diced","3 ribs celery, diced","1 carrot, peeled & diced","¼ red onion, diced","½ bunch green onions, sliced","⅓ bunch parsley, chopped","½ cup mayo","2 tbsp lemon juice","2 tbsp apple cider vinegar","1 tsp dried dill","1 tsp salt","1 tsp dried basil","1 tsp minced garlic"],
+    instructions: ["Boil spelt berries until tender, ~45 min. Drain & cool.","Mix spelt, beans, and all veggies in large bowl.","Whisk mayo, lemon juice, vinegar, and spices.","Pour dressing over salad, mix well.","Chill 1 hour. Keeps 5 days."]
   },
   {
     id: 2,
     title: "Grandma's Sugar Cookies",
     tags: ["dessert", "baking", "cookies"],
-    ingredients: ["1 cup softened butter", "1 cup sugar", "1 egg", "1 tsp vanilla", "2½ cups flour", "½ tsp baking powder"],
-    instructions: ["Cream butter and sugar until fluffy", "Beat in egg and vanilla", "Mix flour and baking powder, add gradually", "Chill dough 1 hour", "Roll out and cut shapes", "Bake at 350°F for 8-10 minutes"]
+    ingredients: ["1 cup softened butter","1 cup sugar","1 egg","1 tsp vanilla","2½ cups flour","½ tsp baking powder"],
+    instructions: ["Cream butter and sugar until fluffy","Beat in egg and vanilla","Mix flour and baking powder, add gradually","Chill dough 1 hour","Roll out and cut shapes","Bake at 350°F for 8-10 min"]
   },
   {
     id: 3,
     title: "Chicken Tetrazzini",
     tags: ["dinner", "chicken", "pasta"],
-    ingredients: ["8 oz spaghetti", "2 cups cooked chicken, cubed", "1 can cream of mushroom soup", "1 cup sour cream", "½ cup chicken broth", "1 cup shredded parmesan"],
-    instructions: ["Cook pasta according to package", "Mix soup, sour cream, and broth", "Combine pasta, chicken, and sauce", "Pour into greased baking dish", "Top with parmesan", "Bake at 350°F for 30 minutes"]
+    ingredients: ["8 oz spaghetti","2 cups cooked chicken, cubed","1 can cream of mushroom soup","1 cup sour cream","½ cup chicken broth","1 cup shredded parmesan"],
+    instructions: ["Cook pasta per package","Mix soup, sour cream, and broth","Combine pasta, chicken, and sauce","Pour into greased baking dish","Top with parmesan","Bake at 350°F for 30 min"]
   },
   {
     id: 4,
     title: "Sunday Pot Roast",
     tags: ["dinner", "beef", "slow-cooker"],
-    ingredients: ["3 lb chuck roast", "1 packet onion soup mix", "4 carrots, chunked", "4 potatoes, quartered", "1 cup beef broth"],
-    instructions: ["Sear roast on all sides in hot pan", "Place in slow cooker", "Add vegetables around meat", "Sprinkle soup mix over top", "Pour in broth", "Cook on LOW 8 hours"]
+    ingredients: ["3 lb chuck roast","1 packet onion soup mix","4 carrots, chunked","4 potatoes, quartered","1 cup beef broth"],
+    instructions: ["Sear roast on all sides","Place in slow cooker with veggies","Sprinkle soup mix over top","Pour in broth","Cook on LOW 8 hours"]
   },
   {
     id: 5,
     title: "Lemon Icebox Pie",
     tags: ["dessert", "summer", "no-bake"],
-    ingredients: ["1 graham cracker crust", "2 cans sweetened condensed milk", "¾ cup fresh lemon juice", "1 tbsp lemon zest", "Whipped cream for topping"],
-    instructions: ["Mix condensed milk, lemon juice, and zest", "Pour into crust", "Refrigerate at least 4 hours", "Top with whipped cream", "Garnish with extra zest"]
+    ingredients: ["1 graham cracker crust","2 cans sweetened condensed milk","¾ cup fresh lemon juice","1 tbsp lemon zest","Whipped cream"],
+    instructions: ["Mix condensed milk, lemon juice, and zest","Pour into crust","Refrigerate at least 4 hours","Top with whipped cream"]
   }
 ];
 
-let recipes = [];
-let filteredRecipes = [];
-let currentIndex = 0;
-let activeTag = 'all';
-let editingId = null;
-let isAnimating = false;
+let recipes = [], filteredRecipes = [], currentIndex = 0, activeTag = 'all', editingId = null, isAnimating = false;
 
-// ==================== DOM ====================
 const cardsContainer = document.getElementById('cardsContainer');
 const filterBar = document.getElementById('filterBar');
 const overlay = document.getElementById('overlay');
 const viewModal = document.getElementById('viewModal');
 const formModal = document.getElementById('formModal');
 
-// ==================== INIT ====================
 function init() {
-  loadRecipes();
-  renderTags();
-  filterRecipes();
-  renderCards();
-  bindEvents();
+  loadRecipes(); renderTags(); filterRecipes(); renderCards(); bindEvents();
 }
 
 function loadRecipes() {
-  const stored = localStorage.getItem('micasRecipeBox');
+  const stored = localStorage.getItem('micasRecipeBox3');
   recipes = stored ? JSON.parse(stored) : [...defaultRecipes];
   if (!stored) saveRecipes();
 }
 
 function saveRecipes() {
-  localStorage.setItem('micasRecipeBox', JSON.stringify(recipes));
+  localStorage.setItem('micasRecipeBox3', JSON.stringify(recipes));
 }
 
-// ==================== TAGS ====================
 function getAllTags() {
   const tags = new Set();
   recipes.forEach(r => r.tags.forEach(t => tags.add(t.toLowerCase())));
@@ -864,157 +569,78 @@ function getAllTags() {
 function renderTags() {
   const tags = getAllTags();
   let html = `<div class="tag-tab ${activeTag === 'all' ? 'active' : ''}" data-tag="all">All</div>`;
-  tags.forEach(t => {
-    html += `<div class="tag-tab ${activeTag === t ? 'active' : ''}" data-tag="${t}">${t}</div>`;
-  });
+  tags.forEach(t => { html += `<div class="tag-tab ${activeTag === t ? 'active' : ''}" data-tag="${t}">${t}</div>`; });
   filterBar.innerHTML = html;
 }
 
 function filterRecipes() {
-  if (activeTag === 'all') {
-    filteredRecipes = [...recipes];
-  } else {
-    filteredRecipes = recipes.filter(r => 
-      r.tags.some(t => t.toLowerCase() === activeTag)
-    );
-  }
+  filteredRecipes = activeTag === 'all' ? [...recipes] : recipes.filter(r => r.tags.some(t => t.toLowerCase() === activeTag));
   currentIndex = 0;
 }
 
-// ==================== CARDS ====================
 function renderCards() {
   cardsContainer.innerHTML = '';
-  
   if (filteredRecipes.length === 0) {
-    cardsContainer.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">📝</div>
-        <div>No recipes yet!</div>
-        <div style="font-size: 0.8rem; margin-top: 5px;">Tap + to add one</div>
-      </div>
-    `;
+    cardsContainer.innerHTML = `<div class="empty-state"><div style="font-size:2rem;">📝</div><div>No recipes yet!</div></div>`;
     return;
   }
-  
-  // Render cards with positions relative to current
-  const positions = [-2, -1, 0, 1, 2, 3];
-  
-  positions.forEach(pos => {
-    const idx = getWrappedIndex(currentIndex - pos);
-    if (idx === -1) return;
-    
-    const recipe = filteredRecipes[idx];
-    const card = createCardElement(recipe, pos);
-    cardsContainer.appendChild(card);
-  });
+  for (let i = Math.min(4, filteredRecipes.length - 1); i >= 0; i--) {
+    const idx = (currentIndex + i) % filteredRecipes.length;
+    cardsContainer.appendChild(createCard(filteredRecipes[idx], i));
+  }
 }
 
-function getWrappedIndex(idx) {
-  if (filteredRecipes.length === 0) return -1;
-  while (idx < 0) idx += filteredRecipes.length;
-  return idx % filteredRecipes.length;
-}
-
-function createCardElement(recipe, position) {
+function createCard(recipe, position) {
   const card = document.createElement('div');
   card.className = 'recipe-card';
-  card.dataset.pos = Math.abs(position) > 3 ? 'hidden' : position;
+  card.dataset.pos = position;
   card.dataset.id = recipe.id;
-  
-  const previewIngredients = recipe.ingredients.slice(0, 3).map(i => `• ${i}`).join('<br>');
-  
+  const preview = recipe.ingredients.slice(0, 3).map(i => `• ${i}`).join('<br>');
   card.innerHTML = `
-    <div class="card-tab">
-      <span class="card-tab-title">${recipe.title}</span>
-    </div>
+    <div class="card-tab"><span class="card-tab-title">${recipe.title}</span></div>
     <div class="card-content">
       <div class="card-title">${recipe.title}</div>
       <div class="card-meta">${recipe.tags.join(' • ')}</div>
-      <div class="card-preview">
-        ${previewIngredients}
-        ${recipe.ingredients.length > 3 ? '<br>...' : ''}
-      </div>
-    </div>
-  `;
-  
-  // Click on card tab (top) to flip to it
-  const tab = card.querySelector('.card-tab');
-  tab.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const pos = parseInt(card.dataset.pos);
-    if (pos !== 0) {
-      flipToPosition(pos);
-    }
-  });
-  
-  // Click on card body to pull it out and view
-  const content = card.querySelector('.card-content');
-  content.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const pos = parseInt(card.dataset.pos);
-    if (pos === 0) {
-      openViewModal(recipe);
-    }
-  });
-  
+      <div class="card-preview">${preview}${recipe.ingredients.length > 3 ? '<br>...' : ''}</div>
+    </div>`;
+  card.querySelector('.card-tab').onclick = (e) => { e.stopPropagation(); if (position !== 0) flipTo(position); };
+  card.querySelector('.card-content').onclick = (e) => { e.stopPropagation(); if (position === 0) openViewModal(recipe); };
   return card;
 }
 
-function flipToPosition(pos) {
+function flipTo(pos) {
   if (isAnimating || pos === 0) return;
   isAnimating = true;
-  
-  // Move index
-  if (pos < 0) {
-    // Flip backward (card from left comes forward)
-    currentIndex = getWrappedIndex(currentIndex + 1);
-  } else {
-    // Flip forward (front card goes back)
-    currentIndex = getWrappedIndex(currentIndex - 1);
-  }
-  
+  currentIndex = (currentIndex + pos) % filteredRecipes.length;
   renderCards();
-  
-  setTimeout(() => {
-    isAnimating = false;
-  }, 350);
+  setTimeout(() => { isAnimating = false; }, 350);
 }
 
-function goNext() {
-  if (isAnimating || filteredRecipes.length < 2) return;
-  flipToPosition(1);
-}
-
+function goNext() { if (filteredRecipes.length > 1 && !isAnimating) flipTo(1); }
 function goPrev() {
-  if (isAnimating || filteredRecipes.length < 2) return;
-  flipToPosition(-1);
+  if (filteredRecipes.length < 2 || isAnimating) return;
+  isAnimating = true;
+  currentIndex = (currentIndex - 1 + filteredRecipes.length) % filteredRecipes.length;
+  renderCards();
+  setTimeout(() => { isAnimating = false; }, 350);
 }
 
-// ==================== MODALS ====================
 function openViewModal(recipe) {
   document.getElementById('viewTitle').textContent = recipe.title;
   document.getElementById('viewMeta').textContent = recipe.tags.join(' • ');
-  
-  document.getElementById('viewIngredients').innerHTML = 
-    recipe.ingredients.map(i => `<li>${i}</li>`).join('');
-  document.getElementById('viewInstructions').innerHTML = 
-    recipe.instructions.map(i => `<li>${i}</li>`).join('');
-  
+  document.getElementById('viewIngredients').innerHTML = recipe.ingredients.map(i => `<li>${i}</li>`).join('');
+  document.getElementById('viewInstructions').innerHTML = recipe.instructions.map(i => `<li>${i}</li>`).join('');
   viewModal.dataset.recipeId = recipe.id;
-  
   overlay.classList.add('show');
   viewModal.classList.add('show');
 }
 
-function closeViewModal() {
-  overlay.classList.remove('show');
-  viewModal.classList.remove('show');
-}
+function closeViewModal() { overlay.classList.remove('show'); viewModal.classList.remove('show'); }
 
 function openFormModal(recipe = null) {
   if (recipe) {
     editingId = recipe.id;
-    document.getElementById('formTitle').textContent = 'Edit Recipe Card';
+    document.getElementById('formTitle').textContent = 'Edit Recipe';
     document.getElementById('inputName').value = recipe.title;
     document.getElementById('inputIngredients').value = recipe.ingredients.join('\n');
     document.getElementById('inputInstructions').value = recipe.instructions.join('\n');
@@ -1027,122 +653,57 @@ function openFormModal(recipe = null) {
     document.getElementById('inputInstructions').value = '';
     document.getElementById('inputTags').value = '';
   }
-  
   closeViewModal();
   overlay.classList.add('show');
   formModal.classList.add('show');
 }
 
-function closeFormModal() {
-  overlay.classList.remove('show');
-  formModal.classList.remove('show');
-}
+function closeFormModal() { overlay.classList.remove('show'); formModal.classList.remove('show'); }
 
 function saveForm() {
   const name = document.getElementById('inputName').value.trim();
-  if (!name) {
-    alert('Please enter a recipe name!');
-    return;
-  }
-  
-  const ingredients = document.getElementById('inputIngredients').value
-    .split('\n').map(l => l.trim()).filter(l => l);
-  const instructions = document.getElementById('inputInstructions').value
-    .split('\n').map(l => l.trim()).filter(l => l);
-  const tags = document.getElementById('inputTags').value
-    .split(',').map(t => t.trim().toLowerCase()).filter(t => t);
-  
+  if (!name) { alert('Please enter a recipe name!'); return; }
+  const ingredients = document.getElementById('inputIngredients').value.split('\n').map(l => l.trim()).filter(l => l);
+  const instructions = document.getElementById('inputInstructions').value.split('\n').map(l => l.trim()).filter(l => l);
+  const tags = document.getElementById('inputTags').value.split(',').map(t => t.trim().toLowerCase()).filter(t => t);
   if (editingId) {
     const idx = recipes.findIndex(r => r.id === editingId);
-    if (idx !== -1) {
-      recipes[idx] = { ...recipes[idx], title: name, ingredients, instructions, tags };
-    }
+    if (idx !== -1) recipes[idx] = { ...recipes[idx], title: name, ingredients, instructions, tags };
   } else {
-    recipes.push({
-      id: Date.now(),
-      title: name,
-      ingredients,
-      instructions,
-      tags: tags.length ? tags : ['uncategorized']
-    });
+    recipes.push({ id: Date.now(), title: name, ingredients, instructions, tags: tags.length ? tags : ['uncategorized'] });
   }
-  
-  saveRecipes();
-  renderTags();
-  filterRecipes();
-  renderCards();
-  closeFormModal();
+  saveRecipes(); renderTags(); filterRecipes(); renderCards(); closeFormModal();
 }
 
 function deleteRecipe() {
   const id = parseInt(viewModal.dataset.recipeId);
-  if (confirm('Delete this recipe card?')) {
+  if (confirm('Delete this recipe?')) {
     recipes = recipes.filter(r => r.id !== id);
-    saveRecipes();
-    renderTags();
-    filterRecipes();
-    renderCards();
-    closeViewModal();
+    saveRecipes(); renderTags(); filterRecipes(); renderCards(); closeViewModal();
   }
 }
 
-// ==================== EVENTS ====================
 function bindEvents() {
-  // Navigation
-  document.getElementById('prevBtn').addEventListener('click', goPrev);
-  document.getElementById('nextBtn').addEventListener('click', goNext);
-  document.getElementById('addBtn').addEventListener('click', () => openFormModal());
+  document.getElementById('prevBtn').onclick = goPrev;
+  document.getElementById('nextBtn').onclick = goNext;
+  document.getElementById('addBtn').onclick = () => openFormModal();
+  filterBar.onclick = (e) => { if (e.target.classList.contains('tag-tab')) { activeTag = e.target.dataset.tag; renderTags(); filterRecipes(); renderCards(); } };
+  document.getElementById('viewClose').onclick = closeViewModal;
+  document.getElementById('viewDone').onclick = closeViewModal;
+  document.getElementById('viewEdit').onclick = () => { const r = recipes.find(r => r.id === parseInt(viewModal.dataset.recipeId)); if (r) openFormModal(r); };
+  document.getElementById('viewDelete').onclick = deleteRecipe;
+  document.getElementById('formCancel').onclick = closeFormModal;
+  document.getElementById('formSave').onclick = saveForm;
+  overlay.onclick = () => { closeViewModal(); closeFormModal(); };
   
-  // Tags
-  filterBar.addEventListener('click', (e) => {
-    if (e.target.classList.contains('tag-tab')) {
-      activeTag = e.target.dataset.tag;
-      renderTags();
-      filterRecipes();
-      renderCards();
-    }
-  });
-  
-  // View Modal
-  document.getElementById('viewClose').addEventListener('click', closeViewModal);
-  document.getElementById('viewDone').addEventListener('click', closeViewModal);
-  document.getElementById('viewEdit').addEventListener('click', () => {
-    const id = parseInt(viewModal.dataset.recipeId);
-    const recipe = recipes.find(r => r.id === id);
-    if (recipe) openFormModal(recipe);
-  });
-  document.getElementById('viewDelete').addEventListener('click', deleteRecipe);
-  
-  // Form Modal
-  document.getElementById('formCancel').addEventListener('click', closeFormModal);
-  document.getElementById('formSave').addEventListener('click', saveForm);
-  
-  // Overlay click to close
-  overlay.addEventListener('click', () => {
-    closeViewModal();
-    closeFormModal();
-  });
-  
-  // Swipe support
-  let touchStartX = 0;
-  let touchStartY = 0;
-  
-  cardsContainer.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  }, { passive: true });
-  
+  let touchStartX = 0, touchStartY = 0;
+  cardsContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; touchStartY = e.changedTouches[0].screenY; }, { passive: true });
   cardsContainer.addEventListener('touchend', (e) => {
     const diffX = touchStartX - e.changedTouches[0].screenX;
     const diffY = Math.abs(touchStartY - e.changedTouches[0].screenY);
-    
-    if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
-      if (diffX > 0) goNext();
-      else goPrev();
-    }
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) { if (diffX > 0) goNext(); else goPrev(); }
   }, { passive: true });
   
-  // Keyboard
   document.addEventListener('keydown', (e) => {
     if (formModal.classList.contains('show') || viewModal.classList.contains('show')) return;
     if (e.key === 'ArrowRight') goNext();
@@ -1150,7 +711,6 @@ function bindEvents() {
   });
 }
 
-// ==================== START ====================
 init();
 </script>
 </body>
