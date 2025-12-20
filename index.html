@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mica's Recipe Box</title>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { 
       margin: 0; 
@@ -14,7 +13,7 @@
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       background: linear-gradient(135deg, #d4b896 0%, #c9a882 50%, #b8956f 100%);
       min-height: 100vh;
       padding: 20px;
@@ -70,32 +69,18 @@
       margin-bottom: 30px;
     }
     
-    /* Recipe Card - ACTUAL STACKING */
+    /* Recipe Card */
     .recipe-card {
       position: absolute;
       left: 50%;
       width: 90%;
       height: 480px;
-      background: #fefcf8;
+      background: white;
       border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      padding: 50px 30px 30px 90px;
+      padding: 40px 30px;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      
-      /* Blue horizontal lines */
-      background-image: 
-        linear-gradient(#dc2626 0 100%),
-        repeating-linear-gradient(
-          transparent,
-          transparent 30px,
-          #93c5fd 30px,
-          #93c5fd 31px
-        );
-      background-size: 2px 100%, 100% 100%;
-      background-position: 75px 0, 0 0;
-      background-repeat: no-repeat;
-      filter: sepia(0.05);
       overflow-y: auto;
     }
     
@@ -135,20 +120,6 @@
       opacity: 1 !important;
     }
     
-    /* Grease stain */
-    .recipe-card::before {
-      content: '';
-      position: absolute;
-      top: 100px;
-      right: 80px;
-      width: 120px;
-      height: 120px;
-      background: radial-gradient(circle, rgba(139, 69, 19, 0.06) 0%, transparent 65%);
-      border-radius: 50%;
-      pointer-events: none;
-      filter: blur(3px);
-    }
-    
     /* Close button */
     .close-btn {
       position: absolute;
@@ -175,47 +146,53 @@
       display: flex;
     }
     
-    /* Card content */
+    /* Card content - Recipe site style */
     .card-content h2 {
-      font-size: 36px;
-      font-family: 'Caveat', cursive;
-      margin-bottom: 20px;
+      font-size: 32px;
+      margin-bottom: 12px;
       color: #1f2937;
-      line-height: 31px;
       font-weight: 700;
+      line-height: 1.2;
     }
     
     .card-content h3 {
-      font-size: 24px;
-      font-family: 'Caveat', cursive;
-      margin-bottom: 10px;
-      margin-top: 20px;
+      font-size: 20px;
+      margin-bottom: 12px;
+      margin-top: 24px;
       color: #374151;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
     }
     
     .card-content ul {
       list-style: none;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     
     .card-content li {
-      font-family: 'Caveat', cursive;
-      font-size: 22px;
-      color: #1f2937;
-      line-height: 31px;
+      font-size: 16px;
+      color: #374151;
+      line-height: 1.8;
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
     }
     
     .card-content li::before {
-      content: '• ';
-      color: #dc2626;
+      content: '•';
+      color: #d4a017;
+      font-size: 20px;
+      position: absolute;
+      left: 0;
     }
     
     .card-content p {
-      font-family: 'Caveat', cursive;
-      font-size: 22px;
-      color: #1f2937;
-      line-height: 31px;
+      font-size: 16px;
+      color: #374151;
+      line-height: 1.8;
       white-space: pre-wrap;
     }
     
@@ -224,47 +201,46 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 15px;
+      margin-top: 12px;
+      margin-bottom: 20px;
     }
     
     .tag {
       background: #fbbf24;
       color: #78350f;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 14px;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 13px;
       font-weight: 600;
-      font-family: sans-serif;
     }
     
     /* Edit mode */
     .edit-mode input,
     .edit-mode textarea {
-      font-family: 'Caveat', cursive;
       width: 100%;
       border: 2px solid #3b82f6;
-      border-radius: 4px;
-      padding: 10px;
-      background: rgba(255,255,255,0.9);
-      line-height: 31px;
-      font-size: 22px;
+      border-radius: 6px;
+      padding: 12px;
+      background: white;
+      font-size: 16px;
+      font-family: inherit;
+      line-height: 1.5;
     }
     
-    .edit-mode input {
-      font-size: 36px;
-      border: none;
-      border-bottom: 2px solid #3b82f6;
-      background: transparent;
-      border-radius: 0;
-      margin-bottom: 20px;
+    .edit-mode input[type="text"]#title {
+      font-size: 28px;
       font-weight: 700;
+      margin-bottom: 16px;
     }
     
     .edit-mode .tag-input {
-      font-family: sans-serif;
       font-size: 14px;
-      line-height: normal;
       margin-top: 10px;
+    }
+    
+    .edit-mode textarea {
+      resize: vertical;
+      min-height: 100px;
     }
     
     /* Navigation */
@@ -354,12 +330,24 @@
     .add-menu h2 {
       font-size: 24px;
       margin-bottom: 20px;
-      font-family: 'Caveat', cursive;
+      color: #1f2937;
     }
     
     .add-menu button {
       width: 100%;
       margin-bottom: 10px;
+      text-align: left;
+      padding: 16px 20px;
+    }
+    
+    .add-menu button span {
+      margin-right: 12px;
+      font-size: 20px;
+    }
+    
+    /* Hidden file input */
+    #photoInput {
+      display: none;
     }
   </style>
 </head>
@@ -368,10 +356,21 @@
   
   <div class="add-menu" id="addMenu">
     <h2>Add New Recipe</h2>
-    <button onclick="addRecipeManual()">✍️ Write Manually</button>
-    <button onclick="addRecipeVoice()">🎤 Dictate Recipe</button>
-    <button onclick="closeAddMenu()" style="background: #6b7280; color: white;">Cancel</button>
+    <button onclick="addRecipeManual()">
+      <span>✍️</span> Write Manually
+    </button>
+    <button onclick="addRecipeVoice()">
+      <span>🎤</span> Dictate Recipe
+    </button>
+    <button onclick="document.getElementById('photoInput').click()">
+      <span>📷</span> Photograph Recipe
+    </button>
+    <button onclick="closeAddMenu()" style="background: #6b7280; color: white;">
+      Cancel
+    </button>
   </div>
+  
+  <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhoto(event)">
 
   <div class="container">
     <div class="recipe-box">
@@ -403,24 +402,45 @@
         recipes = [
           {
             id: '1',
-            title: "Grandma's Cookies",
-            ingredients: ['2 cups flour', '1 cup sugar', '1 stick butter', '1 tsp vanilla'],
-            instructions: 'Mix dry ingredients. Cream butter and sugar. Combine and form into balls. Bake at 350°F for 12 minutes until golden.',
-            tags: ['Dessert', 'Baking']
+            title: "Grandma's Chocolate Chip Cookies",
+            ingredients: [
+              '2 cups all-purpose flour',
+              '1 cup granulated sugar',
+              '1 stick butter, softened',
+              '1 tsp vanilla extract',
+              '2 eggs',
+              '1 cup chocolate chips'
+            ],
+            instructions: 'Preheat oven to 350°F. Mix dry ingredients in one bowl. In another bowl, cream butter and sugar until fluffy. Beat in eggs and vanilla. Gradually blend in dry ingredients. Fold in chocolate chips. Drop by rounded tablespoons onto ungreased cookie sheets. Bake 12 minutes until golden brown. Cool on wire rack.',
+            tags: ['Dessert', 'Baking', 'Classic']
           },
           {
             id: '2',
             title: "Sunday Pot Roast",
-            ingredients: ['3 lb chuck roast', '4 carrots', '3 potatoes', '1 onion', '2 cups beef broth'],
-            instructions: 'Sear roast on all sides. Add vegetables and broth. Cover and cook at 325°F for 3 hours until tender.',
-            tags: ['Dinner', 'Meat']
+            ingredients: [
+              '3 lb chuck roast',
+              '4 large carrots, chopped',
+              '3 potatoes, quartered',
+              '1 large onion, sliced',
+              '2 cups beef broth',
+              'Salt and pepper to taste',
+              '2 tbsp olive oil'
+            ],
+            instructions: 'Season roast with salt and pepper. Heat oil in Dutch oven over medium-high heat. Sear roast on all sides until browned, about 3-4 minutes per side. Remove and set aside. Add vegetables to pot, cook 5 minutes. Return roast to pot, add broth. Cover and cook in 325°F oven for 3 hours until fork-tender. Let rest 10 minutes before slicing.',
+            tags: ['Dinner', 'Meat', 'Comfort Food']
           },
           {
             id: '3',
-            title: "Green Bean Casserole",
-            ingredients: ['2 cans green beans', '1 can cream of mushroom soup', '1 cup fried onions'],
-            instructions: 'Mix beans and soup. Top with half the onions. Bake 25 minutes at 350°F. Add remaining onions, bake 5 more minutes.',
-            tags: ['Side Dish', 'Vegetables']
+            title: "Classic Green Bean Casserole",
+            ingredients: [
+              '2 cans (14.5 oz each) green beans, drained',
+              '1 can cream of mushroom soup',
+              '1 cup crispy fried onions',
+              '1/2 cup milk',
+              '1/4 tsp black pepper'
+            ],
+            instructions: 'Preheat oven to 350°F. Mix green beans, soup, milk, pepper, and half the fried onions in 1.5-quart casserole dish. Bake 25 minutes until hot and bubbling. Stir, top with remaining onions. Bake 5 more minutes until onions are golden.',
+            tags: ['Side Dish', 'Vegetables', 'Holiday']
           }
         ];
       }
@@ -439,7 +459,6 @@
       
       stack.innerHTML = '';
       
-      // Show 4 cards in stack
       for (let i = 0; i < Math.min(4, recipes.length); i++) {
         const idx = (currentIndex + i) % recipes.length;
         const recipe = recipes[idx];
@@ -461,7 +480,6 @@
           </div>
         `;
         
-        // Only front card gets interactions
         if (i === 0) {
           card.addEventListener('touchstart', handleTouchStart, { passive: false });
           card.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -476,25 +494,25 @@
     function renderCardContent(recipe, idx) {
       if (editing && pulledOutIndex === idx) {
         return `
-          <input type="text" id="title" value="${recipe.title}" />
-          <h3>Ingredients:</h3>
-          <textarea id="ingredients" rows="4">${recipe.ingredients.join('\n')}</textarea>
-          <h3>Instructions:</h3>
-          <textarea id="instructions" rows="5">${recipe.instructions}</textarea>
+          <input type="text" id="title" value="${recipe.title}" placeholder="Recipe Title" />
           <h3>Tags (comma separated):</h3>
           <input type="text" class="tag-input" id="tags" value="${(recipe.tags || []).join(', ')}" placeholder="Dinner, Meat, Easy" />
-          <button class="done-btn" onclick="saveEdit()">Done Editing</button>
+          <h3>Ingredients:</h3>
+          <textarea id="ingredients" rows="6" placeholder="One ingredient per line">${recipe.ingredients.join('\n')}</textarea>
+          <h3>Instructions:</h3>
+          <textarea id="instructions" rows="8" placeholder="Write your instructions here...">${recipe.instructions}</textarea>
+          <button class="done-btn" onclick="saveEdit()">Save Recipe</button>
           <button class="delete-btn-bottom" onclick="deleteRecipe()">Delete Recipe</button>
         `;
       } else {
         return `
           <h2>${recipe.title}</h2>
           ${(recipe.tags && recipe.tags.length) ? `<div class="tags">${recipe.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
-          <h3>Ingredients:</h3>
+          <h3>Ingredients</h3>
           <ul>
             ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
           </ul>
-          <h3>Instructions:</h3>
+          <h3>Instructions</h3>
           <p>${recipe.instructions}</p>
         `;
       }
@@ -573,7 +591,7 @@
       closeAddMenu();
       recipes.push({
         id: Date.now().toString(),
-        title: 'New Recipe',
+        title: '',
         ingredients: [''],
         instructions: '',
         tags: []
@@ -588,6 +606,18 @@
     function addRecipeVoice() {
       closeAddMenu();
       alert('Voice dictation coming soon! This will use Gemini API to format your spoken recipe.');
+    }
+    
+    function handlePhoto(event) {
+      closeAddMenu();
+      const file = event.target.files[0];
+      if (file) {
+        // For now, just show a placeholder
+        alert('Photo selected! OCR with Gemini Vision API coming soon.\n\nThis will extract the recipe text from your photo and add it to your box.');
+        
+        // Reset the file input
+        event.target.value = '';
+      }
     }
     
     function saveEdit() {
@@ -607,7 +637,7 @@
         alert('Cannot delete the last recipe!');
         return;
       }
-      if (confirm('Delete this recipe?')) {
+      if (confirm('Delete this recipe permanently?')) {
         recipes.splice(pulledOutIndex, 1);
         currentIndex = Math.max(0, currentIndex - 1);
         pulledOutIndex = -1;
