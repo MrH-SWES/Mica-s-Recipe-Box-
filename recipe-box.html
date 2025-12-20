@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mica's Recipe Box</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f0e5d8 0%, #e8dcc8 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 42px;
+      text-align: center;
+      color: #ffffff;
+      margin-bottom: 30px;
+      font-family: 'Brush Script MT', cursive;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      background: linear-gradient(180deg, #f4c430 0%, #e8b923 50%, #d4a017 100%);
+      padding: 30px;
+      border-radius: 20px 20px 0 0;
+      position: relative;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    
+    h1::before {
+      content: '🌼';
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      opacity: 0.7;
+    }
+    
+    .dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 15px;
+      padding: 15px;
+      background: linear-gradient(180deg, #e8b923 0%, #d4a017 100%);
+    }
+    
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .dot.active {
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    }
+    
+    .card {
+      background: #f8f6f0;
+      background-image: 
+        linear-gradient(#dc2626 0 100%),
+        repeating-linear-gradient(
+          transparent,
+          transparent 30px,
+          #93c5fd 30px,
+          #93c5fd 31px
+        );
+      background-size: 2px 100%, 100% 100%;
+      background-position: 70px 0, 0 0;
+      background-repeat: no-repeat;
+      border-radius: 0 0 20px 20px;
+      padding: 40px 40px 40px 90px;
+      box-shadow: 
+        0 8px 16px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.5);
+      position: relative;
+      min-height: 450px;
+      filter: sepia(0.08);
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 80px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(139, 69, 19, 0.08) 0%, transparent 60%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    
+    .delete-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 22px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+    }
+    
+    .delete-btn:hover {
+      background: #dc2626;
+      transform: scale(1.1);
+    }
+    
+    h2 {
+      font-size: 32px;
+      font-family: 'Caveat', cursive;
+      margin-bottom: 25px;
+      cursor: pointer;
+      color: #1f2937;
+      line-height: 31px;
+    }
+    
+    h3 {
+      font-size: 22px;
+      font-family: 'Caveat', cursive;
+      margin-bottom: 12px;
+      margin-top: 20px;
+      color: #374151;
+    }
+    
+    input, textarea {
+      font-size: 18px;
+      font-family: 'Caveat', cursive;
+      width: 100%;
+      border: 2px solid #3b82f6;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 20px;
+      background: rgba(255,255,255,0.7);
+      line-height: 31px;
+    }
+    
+    input {
+      font-size: 32px;
+      border: none;
+      border-bottom: 2px solid #3b82f6;
+      background: transparent;
+      border-radius: 0;
+      line-height: 31px;
+    }
+    
+    ul {
+      margin-bottom: 20px;
+      cursor: pointer;
+      list-style: none;
+    }
+    
+    li {
+      font-family: 'Caveat', cursive;
+      font-size: 20px;
+      color: #1f2937;
+      line-height: 31px;
+    }
+    
+    li::before {
+      content: '• ';
+      color: #dc2626;
+    }
+    
+    p {
+      font-family: 'Caveat', cursive;
+      font-size: 20px;
+      cursor: pointer;
+      white-space: pre-wrap;
+      color: #1f2937;
+      line-height: 31px;
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(180deg, #d4a017 0%, #c49116 100%);
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    button {
+      background: #ffffff;
+      color: #1f2937;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .done-btn {
+      background: #10b981;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 15px;
+    }
+    
+    .record-btn {
+      background: #ef4444;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mica's Recipe Box</h1>
+    
+    <div id="dots" class="dots"></div>
+    
+    <div class="card">
+      <button class="delete-btn" onclick="deleteRecipe()">×</button>
+      
+      <div id="content"></div>
+    </div>
+    
+    <div class="buttons">
+      <button onclick="addRecipe()">+ New Recipe</button>
+      <button class="record-btn" onclick="alert('Voice recording coming soon!')">🎤 Record</button>
+    </div>
+  </div>
+
+  <script>
+    let recipes = [];
+    let currentIndex = 0;
+    let editing = false;
+    
+    function loadRecipes() {
+      const saved = localStorage.getItem('recipes');
+      if (saved) {
+        recipes = JSON.parse(saved);
+      } else {
+        recipes = [{
+          id: '1',
+          title: "Grandma's Cookies",
+          ingredients: ['2 cups flour', '1 cup sugar', '1 stick butter'],
+          instructions: 'Mix everything. Bake at 350 for 12 minutes.'
+        }];
+      }
+      render();
+    }
+    
+    function save() {
+      localStorage.setItem('recipes', JSON.stringify(recipes));
+    }
+    
+    function render() {
+      const recipe = recipes[currentIndex];
+      
+      document.getElementById('dots').innerHTML = recipes.map((_, i) => 
+        `<button class="dot ${i === currentIndex ? 'active' : ''}" onclick="currentIndex=${i}; render()"></button>`
+      ).join('');
+      
+      if (editing) {
+        document.getElementById('content').innerHTML = `
+          <input type="text" id="title" value="${recipe.title}" />
+          <h3>Ingredients:</h3>
+          <textarea id="ingredients" rows="5">${recipe.ingredients.join('\n')}</textarea>
+          <h3>Instructions:</h3>
+          <textarea id="instructions" rows="6">${recipe.instructions}</textarea>
+          <button class="done-btn" onclick="saveEdit()">Done Editing</button>
+        `;
+      } else {
+        document.getElementById('content').innerHTML = `
+          <h2 onclick="editing=true; render()">${recipe.title}</h2>
+          <h3>Ingredients:</h3>
+          <ul onclick="editing=true; render()">
+            ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+          </ul>
+          <h3>Instructions:</h3>
+          <p onclick="editing=true; render()">${recipe.instructions}</p>
+        `;
+      }
+    }
+    
+    function saveEdit() {
+      const recipe = recipes[currentIndex];
+      recipe.title = document.getElementById('title').value;
+      recipe.ingredients = document.getElementById('ingredients').value.split('\n').filter(i => i.trim());
+      recipe.instructions = document.getElementById('instructions').value;
+      editing = false;
+      save();
+      render();
+    }
+    
+    function addRecipe() {
+      recipes.push({
+        id: Date.now().toString(),
+        title: 'New Recipe',
+        ingredients: [''],
+        instructions: ''
+      });
+      currentIndex = recipes.length - 1;
+      editing = true;
+      save();
+      render();
+    }
+    
+    function deleteRecipe() {
+      if (recipes.length === 1) {
+        alert('Cannot delete the last recipe!');
+        return;
+      }
+      recipes.splice(currentIndex, 1);
+      currentIndex = Math.max(0, currentIndex - 1);
+      save();
+      render();
+    }
+    
+    loadRecipes();
+  </script>
+</body>
+</html>
