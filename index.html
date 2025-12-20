@@ -26,7 +26,6 @@
     .container {
       max-width: 600px;
       width: 100%;
-      perspective: 1000px;
     }
     
     /* The Bakelite Recipe Box */
@@ -37,55 +36,52 @@
         0 20px 60px rgba(0,0,0,0.4),
         inset 0 2px 4px rgba(255,255,255,0.3),
         inset 0 -2px 4px rgba(0,0,0,0.2);
-      padding: 30px;
+      padding: 40px;
       position: relative;
     }
     
-    /* Floral Decal on Box */
+    /* Floral Decal */
     .recipe-box::before {
       content: '';
       position: absolute;
-      top: 15px;
-      right: 20px;
-      width: 80px;
-      height: 80px;
+      top: 20px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
       background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="15" fill="white" opacity="0.7"/><circle cx="35" cy="35" r="12" fill="white" opacity="0.6"/><circle cx="65" cy="35" r="12" fill="white" opacity="0.6"/><circle cx="35" cy="65" r="12" fill="white" opacity="0.6"/><circle cx="65" cy="65" r="12" fill="white" opacity="0.6"/></svg>');
-      opacity: 0.8;
+      opacity: 0.7;
       pointer-events: none;
     }
     
     h1 {
-      font-size: 36px;
+      font-size: 38px;
       color: white;
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
       font-family: 'Brush Script MT', cursive;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-      letter-spacing: 1px;
     }
     
     /* Card Stack Container */
     .card-stack {
       position: relative;
       width: 100%;
-      height: 500px;
-      margin-bottom: 20px;
+      height: 520px;
+      margin-bottom: 30px;
     }
     
-    /* Individual Recipe Card */
+    /* Recipe Card - ACTUAL STACKING */
     .recipe-card {
       position: absolute;
-      width: 100%;
-      height: 100%;
+      left: 50%;
+      width: 90%;
+      height: 480px;
       background: #fefcf8;
       border-radius: 4px;
-      box-shadow: 
-        0 4px 12px rgba(0,0,0,0.2),
-        inset 0 1px 0 rgba(255,255,255,0.5);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       padding: 50px 30px 30px 90px;
-      cursor: grab;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      touch-action: none;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       
       /* Blue horizontal lines */
       background-image: 
@@ -99,16 +95,47 @@
       background-size: 2px 100%, 100% 100%;
       background-position: 75px 0, 0 0;
       background-repeat: no-repeat;
-      
-      /* Subtle weathering */
-      filter: sepia(0.05) saturate(0.95);
+      filter: sepia(0.05);
+      overflow-y: auto;
     }
     
-    .recipe-card:active {
-      cursor: grabbing;
+    /* Stacking positions */
+    .recipe-card:nth-child(1) {
+      transform: translateX(-50%) translateY(0px);
+      z-index: 10;
     }
     
-    /* Grease stain effect */
+    .recipe-card:nth-child(2) {
+      transform: translateX(-48%) translateY(12px);
+      z-index: 9;
+      opacity: 0.95;
+      width: 88%;
+    }
+    
+    .recipe-card:nth-child(3) {
+      transform: translateX(-46%) translateY(24px);
+      z-index: 8;
+      opacity: 0.85;
+      width: 86%;
+    }
+    
+    .recipe-card:nth-child(4) {
+      transform: translateX(-44%) translateY(36px);
+      z-index: 7;
+      opacity: 0.7;
+      width: 84%;
+    }
+    
+    /* Pulled out state */
+    .recipe-card.pulled-out {
+      transform: translateX(-50%) translateY(-30px) scale(1.02) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
+      z-index: 100 !important;
+      width: 95% !important;
+      opacity: 1 !important;
+    }
+    
+    /* Grease stain */
     .recipe-card::before {
       content: '';
       position: absolute;
@@ -122,31 +149,37 @@
       filter: blur(3px);
     }
     
-    /* Card stacking effect - cards behind */
-    .recipe-card:nth-child(2) {
-      transform: translateY(8px) scale(0.98);
-      opacity: 0.9;
-      z-index: -1;
+    /* Close button */
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: white;
+      font-size: 28px;
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      line-height: 1;
+      padding: 0;
     }
     
-    .recipe-card:nth-child(3) {
-      transform: translateY(16px) scale(0.96);
-      opacity: 0.7;
-      z-index: -2;
-    }
-    
-    /* Pulled out state */
-    .recipe-card.pulled-out {
-      transform: translateY(-20px) scale(1.02);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-      z-index: 100;
+    .pulled-out .close-btn {
+      display: flex;
     }
     
     /* Card content */
     .card-content h2 {
       font-size: 36px;
       font-family: 'Caveat', cursive;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       color: #1f2937;
       line-height: 31px;
       font-weight: 700;
@@ -155,8 +188,8 @@
     .card-content h3 {
       font-size: 24px;
       font-family: 'Caveat', cursive;
-      margin-bottom: 12px;
-      margin-top: 25px;
+      margin-bottom: 10px;
+      margin-top: 20px;
       color: #374151;
       font-weight: 700;
     }
@@ -186,6 +219,24 @@
       white-space: pre-wrap;
     }
     
+    /* Tags */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+    
+    .tag {
+      background: #fbbf24;
+      color: #78350f;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: sans-serif;
+    }
+    
     /* Edit mode */
     .edit-mode input,
     .edit-mode textarea {
@@ -194,7 +245,7 @@
       border: 2px solid #3b82f6;
       border-radius: 4px;
       padding: 10px;
-      background: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.9);
       line-height: 31px;
       font-size: 22px;
     }
@@ -209,7 +260,14 @@
       font-weight: 700;
     }
     
-    /* Navigation indicator */
+    .edit-mode .tag-input {
+      font-family: sans-serif;
+      font-size: 14px;
+      line-height: normal;
+      margin-top: 10px;
+    }
+    
+    /* Navigation */
     .card-indicator {
       text-align: center;
       margin-bottom: 20px;
@@ -219,7 +277,7 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     }
     
-    /* Buttons */
+    /* Controls */
     .controls {
       display: flex;
       gap: 12px;
@@ -244,15 +302,6 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     }
     
-    button:active {
-      transform: translateY(0);
-    }
-    
-    .record-btn {
-      background: #ef4444;
-      color: white;
-    }
-    
     .done-btn {
       background: #10b981;
       color: white;
@@ -260,25 +309,70 @@
       width: 100%;
     }
     
-    .delete-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+    .delete-btn-bottom {
       background: #ef4444;
       color: white;
+      margin-top: 10px;
+      width: 100%;
+    }
+    
+    /* Add menu */
+    .add-menu {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      z-index: 1000;
+      max-width: 400px;
+      width: 90%;
+    }
+    
+    .add-menu.active {
+      display: block;
+    }
+    
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    
+    .overlay.active {
+      display: block;
+    }
+    
+    .add-menu h2 {
       font-size: 24px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
+      margin-bottom: 20px;
+      font-family: 'Caveat', cursive;
+    }
+    
+    .add-menu button {
+      width: 100%;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
+  <div class="overlay" id="overlay" onclick="closeAddMenu()"></div>
+  
+  <div class="add-menu" id="addMenu">
+    <h2>Add New Recipe</h2>
+    <button onclick="addRecipeManual()">✍️ Write Manually</button>
+    <button onclick="addRecipeVoice()">🎤 Dictate Recipe</button>
+    <button onclick="closeAddMenu()" style="background: #6b7280; color: white;">Cancel</button>
+  </div>
+
   <div class="container">
     <div class="recipe-box">
       <h1>Mica's Recipe Box</h1>
@@ -288,8 +382,7 @@
       <div class="card-stack" id="cardStack"></div>
       
       <div class="controls">
-        <button onclick="addRecipe()">+ New Recipe</button>
-        <button class="record-btn" onclick="alert('Voice recording coming soon!')">🎤 Record</button>
+        <button onclick="openAddMenu()">+ New Recipe</button>
       </div>
     </div>
   </div>
@@ -297,7 +390,7 @@
   <script>
     let recipes = [];
     let currentIndex = 0;
-    let isPulledOut = false;
+    let pulledOutIndex = -1;
     let editing = false;
     let touchStartX = 0;
     let touchStartY = 0;
@@ -312,13 +405,22 @@
             id: '1',
             title: "Grandma's Cookies",
             ingredients: ['2 cups flour', '1 cup sugar', '1 stick butter', '1 tsp vanilla'],
-            instructions: 'Mix dry ingredients. Cream butter and sugar. Combine and form into balls. Bake at 350°F for 12 minutes until golden.'
+            instructions: 'Mix dry ingredients. Cream butter and sugar. Combine and form into balls. Bake at 350°F for 12 minutes until golden.',
+            tags: ['Dessert', 'Baking']
           },
           {
             id: '2',
-            title: "Pot Roast",
+            title: "Sunday Pot Roast",
             ingredients: ['3 lb chuck roast', '4 carrots', '3 potatoes', '1 onion', '2 cups beef broth'],
-            instructions: 'Sear roast on all sides. Add vegetables and broth. Cover and cook at 325°F for 3 hours until tender.'
+            instructions: 'Sear roast on all sides. Add vegetables and broth. Cover and cook at 325°F for 3 hours until tender.',
+            tags: ['Dinner', 'Meat']
+          },
+          {
+            id: '3',
+            title: "Green Bean Casserole",
+            ingredients: ['2 cans green beans', '1 can cream of mushroom soup', '1 cup fried onions'],
+            instructions: 'Mix beans and soup. Top with half the onions. Bake 25 minutes at 350°F. Add remaining onions, bake 5 more minutes.',
+            tags: ['Side Dish', 'Vegetables']
           }
         ];
       }
@@ -335,48 +437,59 @@
       
       indicator.textContent = `Recipe ${currentIndex + 1} of ${recipes.length}`;
       
-      // Show current card and 2 behind it
       stack.innerHTML = '';
-      for (let i = 0; i < Math.min(3, recipes.length); i++) {
+      
+      // Show 4 cards in stack
+      for (let i = 0; i < Math.min(4, recipes.length); i++) {
         const idx = (currentIndex + i) % recipes.length;
         const recipe = recipes[idx];
         const card = document.createElement('div');
         card.className = 'recipe-card';
-        if (i === 0 && isPulledOut) card.classList.add('pulled-out');
-        if (i === 0 && editing) card.classList.add('edit-mode');
+        card.dataset.index = idx;
+        
+        if (pulledOutIndex === idx) {
+          card.classList.add('pulled-out');
+        }
+        if (editing && pulledOutIndex === idx) {
+          card.classList.add('edit-mode');
+        }
         
         card.innerHTML = `
-          ${i === 0 ? `<button class="delete-btn" onclick="deleteRecipe(event)">×</button>` : ''}
+          <button class="close-btn" onclick="closeCard(event)">×</button>
           <div class="card-content">
-            ${renderCardContent(recipe)}
+            ${renderCardContent(recipe, idx)}
           </div>
         `;
         
-        // Only add touch handlers to the front card
+        // Only front card gets interactions
         if (i === 0) {
           card.addEventListener('touchstart', handleTouchStart, { passive: false });
           card.addEventListener('touchmove', handleTouchMove, { passive: false });
           card.addEventListener('touchend', handleTouchEnd, { passive: false });
-          card.addEventListener('click', handleCardClick);
+          card.addEventListener('click', (e) => handleCardClick(e, idx));
         }
         
         stack.appendChild(card);
       }
     }
     
-    function renderCardContent(recipe) {
-      if (editing && !isPulledOut) {
+    function renderCardContent(recipe, idx) {
+      if (editing && pulledOutIndex === idx) {
         return `
           <input type="text" id="title" value="${recipe.title}" />
           <h3>Ingredients:</h3>
           <textarea id="ingredients" rows="4">${recipe.ingredients.join('\n')}</textarea>
           <h3>Instructions:</h3>
           <textarea id="instructions" rows="5">${recipe.instructions}</textarea>
+          <h3>Tags (comma separated):</h3>
+          <input type="text" class="tag-input" id="tags" value="${(recipe.tags || []).join(', ')}" placeholder="Dinner, Meat, Easy" />
           <button class="done-btn" onclick="saveEdit()">Done Editing</button>
+          <button class="delete-btn-bottom" onclick="deleteRecipe()">Delete Recipe</button>
         `;
       } else {
         return `
           <h2>${recipe.title}</h2>
+          ${(recipe.tags && recipe.tags.length) ? `<div class="tags">${recipe.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
           <h3>Ingredients:</h3>
           <ul>
             ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
@@ -388,89 +501,116 @@
     }
     
     function handleTouchStart(e) {
-      if (editing) return;
+      if (editing || pulledOutIndex !== -1) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     }
     
     function handleTouchMove(e) {
-      if (editing) return;
+      if (editing || pulledOutIndex !== -1) return;
       e.preventDefault();
     }
     
     function handleTouchEnd(e) {
-      if (editing) return;
+      if (editing || pulledOutIndex !== -1) return;
       const touchEndX = e.changedTouches[0].clientX;
       const touchEndY = e.changedTouches[0].clientY;
       const diffX = touchStartX - touchEndX;
       const diffY = Math.abs(touchStartY - touchEndY);
       
-      // Swipe threshold
       if (Math.abs(diffX) > 50 && diffY < 50) {
         if (diffX > 0) {
-          // Swiped left - next card
           nextCard();
         } else {
-          // Swiped right - previous card
           previousCard();
         }
       }
     }
     
-    function handleCardClick(e) {
+    function handleCardClick(e, idx) {
+      if (e.target.classList.contains('close-btn')) return;
+      if (e.target.tagName === 'BUTTON') return;
       if (editing) return;
-      if (e.target.classList.contains('delete-btn')) return;
       
-      isPulledOut = !isPulledOut;
+      if (pulledOutIndex === idx) {
+        editing = true;
+      } else {
+        pulledOutIndex = idx;
+      }
+      render();
+    }
+    
+    function closeCard(e) {
+      e.stopPropagation();
+      pulledOutIndex = -1;
+      editing = false;
       render();
     }
     
     function nextCard() {
-      isPulledOut = false;
       currentIndex = (currentIndex + 1) % recipes.length;
+      pulledOutIndex = -1;
       render();
     }
     
     function previousCard() {
-      isPulledOut = false;
       currentIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+      pulledOutIndex = -1;
       render();
     }
     
-    function addRecipe() {
+    function openAddMenu() {
+      document.getElementById('addMenu').classList.add('active');
+      document.getElementById('overlay').classList.add('active');
+    }
+    
+    function closeAddMenu() {
+      document.getElementById('addMenu').classList.remove('active');
+      document.getElementById('overlay').classList.remove('active');
+    }
+    
+    function addRecipeManual() {
+      closeAddMenu();
       recipes.push({
         id: Date.now().toString(),
         title: 'New Recipe',
         ingredients: [''],
-        instructions: ''
+        instructions: '',
+        tags: []
       });
       currentIndex = recipes.length - 1;
-      isPulledOut = true;
+      pulledOutIndex = currentIndex;
       editing = true;
       save();
       render();
     }
     
+    function addRecipeVoice() {
+      closeAddMenu();
+      alert('Voice dictation coming soon! This will use Gemini API to format your spoken recipe.');
+    }
+    
     function saveEdit() {
-      const recipe = recipes[currentIndex];
+      const recipe = recipes[pulledOutIndex];
       recipe.title = document.getElementById('title').value;
       recipe.ingredients = document.getElementById('ingredients').value.split('\n').filter(i => i.trim());
       recipe.instructions = document.getElementById('instructions').value;
+      recipe.tags = document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t);
       editing = false;
+      pulledOutIndex = -1;
       save();
       render();
     }
     
-    function deleteRecipe(e) {
-      e.stopPropagation();
+    function deleteRecipe() {
       if (recipes.length === 1) {
         alert('Cannot delete the last recipe!');
         return;
       }
       if (confirm('Delete this recipe?')) {
-        recipes.splice(currentIndex, 1);
+        recipes.splice(pulledOutIndex, 1);
         currentIndex = Math.max(0, currentIndex - 1);
-        isPulledOut = false;
+        pulledOutIndex = -1;
         editing = false;
         save();
         render();
