@@ -6,69 +6,88 @@
   <title>Mica's Recipe Box</title>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+    }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f0e5d8 0%, #e8dcc8 100%);
+      background: linear-gradient(135deg, #d4b896 0%, #c9a882 50%, #b8956f 100%);
       min-height: 100vh;
       padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .container {
-      max-width: 500px;
-      margin: 0 auto;
+      max-width: 600px;
+      width: 100%;
+      perspective: 1000px;
+    }
+    
+    /* The Bakelite Recipe Box */
+    .recipe-box {
+      background: linear-gradient(135deg, #f9d949 0%, #edb90f 50%, #d4a017 100%);
+      border-radius: 12px;
+      box-shadow: 
+        0 20px 60px rgba(0,0,0,0.4),
+        inset 0 2px 4px rgba(255,255,255,0.3),
+        inset 0 -2px 4px rgba(0,0,0,0.2);
+      padding: 30px;
+      position: relative;
+    }
+    
+    /* Floral Decal on Box */
+    .recipe-box::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="15" fill="white" opacity="0.7"/><circle cx="35" cy="35" r="12" fill="white" opacity="0.6"/><circle cx="65" cy="35" r="12" fill="white" opacity="0.6"/><circle cx="35" cy="65" r="12" fill="white" opacity="0.6"/><circle cx="65" cy="65" r="12" fill="white" opacity="0.6"/></svg>');
+      opacity: 0.8;
+      pointer-events: none;
     }
     
     h1 {
-      font-size: 42px;
+      font-size: 36px;
+      color: white;
       text-align: center;
-      color: #ffffff;
       margin-bottom: 30px;
       font-family: 'Brush Script MT', cursive;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-      background: linear-gradient(180deg, #f4c430 0%, #e8b923 50%, #d4a017 100%);
-      padding: 30px;
-      border-radius: 20px 20px 0 0;
+      letter-spacing: 1px;
+    }
+    
+    /* Card Stack Container */
+    .card-stack {
       position: relative;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      width: 100%;
+      height: 500px;
+      margin-bottom: 20px;
     }
     
-    h1::before {
-      content: '🌼';
+    /* Individual Recipe Card */
+    .recipe-card {
       position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 40px;
-      opacity: 0.7;
-    }
-    
-    .dots {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 15px;
-      padding: 15px;
-      background: linear-gradient(180deg, #e8b923 0%, #d4a017 100%);
-    }
-    
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255,255,255,0.4);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .dot.active {
-      background: #ffffff;
-      box-shadow: 0 0 8px rgba(255,255,255,0.8);
-    }
-    
-    .card {
-      background: #f8f6f0;
+      width: 100%;
+      height: 100%;
+      background: #fefcf8;
+      border-radius: 4px;
+      box-shadow: 
+        0 4px 12px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.5);
+      padding: 50px 30px 30px 90px;
+      cursor: grab;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      touch-action: none;
+      
+      /* Blue horizontal lines */
       background-image: 
         linear-gradient(#dc2626 0 100%),
         repeating-linear-gradient(
@@ -78,227 +97,358 @@
           #93c5fd 31px
         );
       background-size: 2px 100%, 100% 100%;
-      background-position: 70px 0, 0 0;
+      background-position: 75px 0, 0 0;
       background-repeat: no-repeat;
-      border-radius: 0 0 20px 20px;
-      padding: 40px 40px 40px 90px;
-      box-shadow: 
-        0 8px 16px rgba(0,0,0,0.15),
-        inset 0 1px 0 rgba(255,255,255,0.5);
-      position: relative;
-      min-height: 450px;
-      filter: sepia(0.08);
+      
+      /* Subtle weathering */
+      filter: sepia(0.05) saturate(0.95);
     }
     
-    .card::before {
+    .recipe-card:active {
+      cursor: grabbing;
+    }
+    
+    /* Grease stain effect */
+    .recipe-card::before {
       content: '';
       position: absolute;
-      top: 80px;
-      right: 100px;
-      width: 100px;
-      height: 100px;
-      background: radial-gradient(circle, rgba(139, 69, 19, 0.08) 0%, transparent 60%);
+      top: 100px;
+      right: 80px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(139, 69, 19, 0.06) 0%, transparent 65%);
       border-radius: 50%;
       pointer-events: none;
+      filter: blur(3px);
     }
     
-    .delete-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      font-size: 22px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: all 0.2s;
+    /* Card stacking effect - cards behind */
+    .recipe-card:nth-child(2) {
+      transform: translateY(8px) scale(0.98);
+      opacity: 0.9;
+      z-index: -1;
     }
     
-    .delete-btn:hover {
-      background: #dc2626;
-      transform: scale(1.1);
+    .recipe-card:nth-child(3) {
+      transform: translateY(16px) scale(0.96);
+      opacity: 0.7;
+      z-index: -2;
     }
     
-    h2 {
-      font-size: 32px;
+    /* Pulled out state */
+    .recipe-card.pulled-out {
+      transform: translateY(-20px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+      z-index: 100;
+    }
+    
+    /* Card content */
+    .card-content h2 {
+      font-size: 36px;
       font-family: 'Caveat', cursive;
       margin-bottom: 25px;
-      cursor: pointer;
+      color: #1f2937;
+      line-height: 31px;
+      font-weight: 700;
+    }
+    
+    .card-content h3 {
+      font-size: 24px;
+      font-family: 'Caveat', cursive;
+      margin-bottom: 12px;
+      margin-top: 25px;
+      color: #374151;
+      font-weight: 700;
+    }
+    
+    .card-content ul {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    
+    .card-content li {
+      font-family: 'Caveat', cursive;
+      font-size: 22px;
       color: #1f2937;
       line-height: 31px;
     }
     
-    h3 {
-      font-size: 22px;
-      font-family: 'Caveat', cursive;
-      margin-bottom: 12px;
-      margin-top: 20px;
-      color: #374151;
+    .card-content li::before {
+      content: '• ';
+      color: #dc2626;
     }
     
-    input, textarea {
-      font-size: 18px;
+    .card-content p {
+      font-family: 'Caveat', cursive;
+      font-size: 22px;
+      color: #1f2937;
+      line-height: 31px;
+      white-space: pre-wrap;
+    }
+    
+    /* Edit mode */
+    .edit-mode input,
+    .edit-mode textarea {
       font-family: 'Caveat', cursive;
       width: 100%;
       border: 2px solid #3b82f6;
       border-radius: 4px;
       padding: 10px;
-      margin-bottom: 20px;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.8);
       line-height: 31px;
+      font-size: 22px;
     }
     
-    input {
-      font-size: 32px;
+    .edit-mode input {
+      font-size: 36px;
       border: none;
       border-bottom: 2px solid #3b82f6;
       background: transparent;
       border-radius: 0;
-      line-height: 31px;
-    }
-    
-    ul {
       margin-bottom: 20px;
-      cursor: pointer;
-      list-style: none;
+      font-weight: 700;
     }
     
-    li {
-      font-family: 'Caveat', cursive;
-      font-size: 20px;
-      color: #1f2937;
-      line-height: 31px;
+    /* Navigation indicator */
+    .card-indicator {
+      text-align: center;
+      margin-bottom: 20px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     }
     
-    li::before {
-      content: '• ';
-      color: #dc2626;
-    }
-    
-    p {
-      font-family: 'Caveat', cursive;
-      font-size: 20px;
-      cursor: pointer;
-      white-space: pre-wrap;
-      color: #1f2937;
-      line-height: 31px;
-    }
-    
-    .buttons {
+    /* Buttons */
+    .controls {
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 12px;
       justify-content: center;
-      padding: 20px;
-      background: linear-gradient(180deg, #d4a017 0%, #c49116 100%);
-      border-radius: 0 0 20px 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
     button {
-      background: #ffffff;
+      background: white;
       color: #1f2937;
       border: none;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border-radius: 8px;
-      cursor: pointer;
       font-size: 16px;
       font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       transition: all 0.2s;
     }
     
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     }
     
-    .done-btn {
-      background: #10b981;
-      color: white;
-      padding: 10px 20px;
-      margin-top: 15px;
+    button:active {
+      transform: translateY(0);
     }
     
     .record-btn {
       background: #ef4444;
       color: white;
     }
+    
+    .done-btn {
+      background: #10b981;
+      color: white;
+      margin-top: 15px;
+      width: 100%;
+    }
+    
+    .delete-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: white;
+      font-size: 24px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Mica's Recipe Box</h1>
-    
-    <div id="dots" class="dots"></div>
-    
-    <div class="card">
-      <button class="delete-btn" onclick="deleteRecipe()">×</button>
+    <div class="recipe-box">
+      <h1>Mica's Recipe Box</h1>
       
-      <div id="content"></div>
-    </div>
-    
-    <div class="buttons">
-      <button onclick="addRecipe()">+ New Recipe</button>
-      <button class="record-btn" onclick="alert('Voice recording coming soon!')">🎤 Record</button>
+      <div class="card-indicator" id="indicator"></div>
+      
+      <div class="card-stack" id="cardStack"></div>
+      
+      <div class="controls">
+        <button onclick="addRecipe()">+ New Recipe</button>
+        <button class="record-btn" onclick="alert('Voice recording coming soon!')">🎤 Record</button>
+      </div>
     </div>
   </div>
 
   <script>
     let recipes = [];
     let currentIndex = 0;
+    let isPulledOut = false;
     let editing = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
     
     function loadRecipes() {
-      const saved = localStorage.getItem('recipes');
+      const saved = localStorage.getItem('micasRecipes');
       if (saved) {
         recipes = JSON.parse(saved);
       } else {
-        recipes = [{
-          id: '1',
-          title: "Grandma's Cookies",
-          ingredients: ['2 cups flour', '1 cup sugar', '1 stick butter'],
-          instructions: 'Mix everything. Bake at 350 for 12 minutes.'
-        }];
+        recipes = [
+          {
+            id: '1',
+            title: "Grandma's Cookies",
+            ingredients: ['2 cups flour', '1 cup sugar', '1 stick butter', '1 tsp vanilla'],
+            instructions: 'Mix dry ingredients. Cream butter and sugar. Combine and form into balls. Bake at 350°F for 12 minutes until golden.'
+          },
+          {
+            id: '2',
+            title: "Pot Roast",
+            ingredients: ['3 lb chuck roast', '4 carrots', '3 potatoes', '1 onion', '2 cups beef broth'],
+            instructions: 'Sear roast on all sides. Add vegetables and broth. Cover and cook at 325°F for 3 hours until tender.'
+          }
+        ];
       }
       render();
     }
     
     function save() {
-      localStorage.setItem('recipes', JSON.stringify(recipes));
+      localStorage.setItem('micasRecipes', JSON.stringify(recipes));
     }
     
     function render() {
-      const recipe = recipes[currentIndex];
+      const stack = document.getElementById('cardStack');
+      const indicator = document.getElementById('indicator');
       
-      document.getElementById('dots').innerHTML = recipes.map((_, i) => 
-        `<button class="dot ${i === currentIndex ? 'active' : ''}" onclick="currentIndex=${i}; render()"></button>`
-      ).join('');
+      indicator.textContent = `Recipe ${currentIndex + 1} of ${recipes.length}`;
       
-      if (editing) {
-        document.getElementById('content').innerHTML = `
+      // Show current card and 2 behind it
+      stack.innerHTML = '';
+      for (let i = 0; i < Math.min(3, recipes.length); i++) {
+        const idx = (currentIndex + i) % recipes.length;
+        const recipe = recipes[idx];
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+        if (i === 0 && isPulledOut) card.classList.add('pulled-out');
+        if (i === 0 && editing) card.classList.add('edit-mode');
+        
+        card.innerHTML = `
+          ${i === 0 ? `<button class="delete-btn" onclick="deleteRecipe(event)">×</button>` : ''}
+          <div class="card-content">
+            ${renderCardContent(recipe)}
+          </div>
+        `;
+        
+        // Only add touch handlers to the front card
+        if (i === 0) {
+          card.addEventListener('touchstart', handleTouchStart, { passive: false });
+          card.addEventListener('touchmove', handleTouchMove, { passive: false });
+          card.addEventListener('touchend', handleTouchEnd, { passive: false });
+          card.addEventListener('click', handleCardClick);
+        }
+        
+        stack.appendChild(card);
+      }
+    }
+    
+    function renderCardContent(recipe) {
+      if (editing && !isPulledOut) {
+        return `
           <input type="text" id="title" value="${recipe.title}" />
           <h3>Ingredients:</h3>
-          <textarea id="ingredients" rows="5">${recipe.ingredients.join('\n')}</textarea>
+          <textarea id="ingredients" rows="4">${recipe.ingredients.join('\n')}</textarea>
           <h3>Instructions:</h3>
-          <textarea id="instructions" rows="6">${recipe.instructions}</textarea>
+          <textarea id="instructions" rows="5">${recipe.instructions}</textarea>
           <button class="done-btn" onclick="saveEdit()">Done Editing</button>
         `;
       } else {
-        document.getElementById('content').innerHTML = `
-          <h2 onclick="editing=true; render()">${recipe.title}</h2>
+        return `
+          <h2>${recipe.title}</h2>
           <h3>Ingredients:</h3>
-          <ul onclick="editing=true; render()">
+          <ul>
             ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
           </ul>
           <h3>Instructions:</h3>
-          <p onclick="editing=true; render()">${recipe.instructions}</p>
+          <p>${recipe.instructions}</p>
         `;
       }
+    }
+    
+    function handleTouchStart(e) {
+      if (editing) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+    
+    function handleTouchMove(e) {
+      if (editing) return;
+      e.preventDefault();
+    }
+    
+    function handleTouchEnd(e) {
+      if (editing) return;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffX = touchStartX - touchEndX;
+      const diffY = Math.abs(touchStartY - touchEndY);
+      
+      // Swipe threshold
+      if (Math.abs(diffX) > 50 && diffY < 50) {
+        if (diffX > 0) {
+          // Swiped left - next card
+          nextCard();
+        } else {
+          // Swiped right - previous card
+          previousCard();
+        }
+      }
+    }
+    
+    function handleCardClick(e) {
+      if (editing) return;
+      if (e.target.classList.contains('delete-btn')) return;
+      
+      isPulledOut = !isPulledOut;
+      render();
+    }
+    
+    function nextCard() {
+      isPulledOut = false;
+      currentIndex = (currentIndex + 1) % recipes.length;
+      render();
+    }
+    
+    function previousCard() {
+      isPulledOut = false;
+      currentIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+      render();
+    }
+    
+    function addRecipe() {
+      recipes.push({
+        id: Date.now().toString(),
+        title: 'New Recipe',
+        ingredients: [''],
+        instructions: ''
+      });
+      currentIndex = recipes.length - 1;
+      isPulledOut = true;
+      editing = true;
+      save();
+      render();
     }
     
     function saveEdit() {
@@ -311,28 +461,20 @@
       render();
     }
     
-    function addRecipe() {
-      recipes.push({
-        id: Date.now().toString(),
-        title: 'New Recipe',
-        ingredients: [''],
-        instructions: ''
-      });
-      currentIndex = recipes.length - 1;
-      editing = true;
-      save();
-      render();
-    }
-    
-    function deleteRecipe() {
+    function deleteRecipe(e) {
+      e.stopPropagation();
       if (recipes.length === 1) {
         alert('Cannot delete the last recipe!');
         return;
       }
-      recipes.splice(currentIndex, 1);
-      currentIndex = Math.max(0, currentIndex - 1);
-      save();
-      render();
+      if (confirm('Delete this recipe?')) {
+        recipes.splice(currentIndex, 1);
+        currentIndex = Math.max(0, currentIndex - 1);
+        isPulledOut = false;
+        editing = false;
+        save();
+        render();
+      }
     }
     
     loadRecipes();
