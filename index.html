@@ -303,6 +303,105 @@
             margin-bottom: 15px;
             font-style: italic;
         }
+
+        /* Step-by-step cook mode */
+        .cook-step-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px 25px;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .cook-step-number {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            color: var(--sunflower);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .cook-step-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        .cook-step-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+        .cook-step-btn {
+            background: var(--sunflower);
+            color: #333;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+        .cook-step-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .cook-mode-toggle-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .cook-view-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--sunflower);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: 0.2s;
+        }
+        .cook-view-btn.active {
+            background: var(--sunflower);
+            color: #333;
+        }
+        .cook-ingredients-drawer {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .cook-ingredients-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-family: var(--font-head);
+            color: var(--text-dark);
+        }
+        .cook-ingredients-list {
+            margin-top: 15px;
+            display: none;
+        }
+        .cook-ingredients-list.open {
+            display: block;
+        }
+        .cook-ingredients-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .cook-ingredients-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
@@ -440,6 +539,11 @@
         <div class="modal-card" id="expandedContent"></div>
     </div>
 
+    <!-- COOK MODE MODAL -->
+    <div class="modal" id="cookModeModal">
+        <div class="modal-card" id="cookModeContent" style="max-width: 600px;"></div>
+    </div>
+
     <script>
         // CONFIG - API_URL will point to Cloudflare Worker once set up
         const BIN_ID = "6947951243b1c97be9fc48e7"; 
@@ -459,6 +563,12 @@
         let pendingMealDay = null;
         let isRecording = false;
         let recognition = null;
+
+        // Cook mode state
+        let cookModeRecipe = null;
+        let cookModeStep = 0;
+        let cookModeView = 'steps'; // 'steps' or 'full'
+        let ingredientsOpen = false;
 
         const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -659,10 +769,120 @@
                 
                 <div class="card-actions">
                     ${planBtn}
-                    <button class="cook-mode-toggle" onclick="toggleCookMode()" style="flex:1;">Cook Mode</button>
+                    <button class="cook-mode-toggle" onclick="openCookMode('${recipeId.replace(/'/g, "\\'")}')" style="flex:1;">🍳 Cook Mode</button>
                 </div>
             `;
             document.getElementById('expandedModal').classList.add('show');
+        }
+
+        // --- COOK MODE ---
+        function openCookMode(recipeTitle) {
+            cookModeRecipe = allRecipes.find(r => r.title === recipeTitle);
+            if (!cookModeRecipe) return;
+            
+            cookModeStep = 0;
+            cookModeView = 'steps';
+            ingredientsOpen = false;
+            
+            document.body.classList.add('cook-mode-active');
+            document.getElementById('expandedModal').classList.remove('show');
+            document.getElementById('cookModeModal').classList.add('show');
+            
+            // Keep screen awake
+            if (navigator.wakeLock) {
+                navigator.wakeLock.request('screen').catch(console.error);
+            }
+            
+            renderCookMode();
+        }
+
+        function renderCookMode() {
+            const content = document.getElementById('cookModeContent');
+            const r = cookModeRecipe;
+            const totalSteps = r.instructions.length;
+            
+            // View toggle buttons
+            const viewToggle = `
+                <div class="cook-mode-toggle-row">
+                    <button class="cook-view-btn ${cookModeView === 'steps' ? 'active' : ''}" onclick="setCookView('steps')">Step-by-Step</button>
+                    <button class="cook-view-btn ${cookModeView === 'full' ? 'active' : ''}" onclick="setCookView('full')">Full Recipe</button>
+                </div>
+            `;
+            
+            // Ingredients drawer
+            const ingredientsDrawer = `
+                <div class="cook-ingredients-drawer">
+                    <div class="cook-ingredients-toggle" onclick="toggleCookIngredients()">
+                        <span>📝 Ingredients</span>
+                        <span>${ingredientsOpen ? '▲' : '▼'}</span>
+                    </div>
+                    <div class="cook-ingredients-list ${ingredientsOpen ? 'open' : ''}">
+                        <ul>${r.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>
+                    </div>
+                </div>
+            `;
+            
+            let mainContent = '';
+            
+            if (cookModeView === 'steps') {
+                // Step-by-step view
+                const currentInstruction = r.instructions[cookModeStep];
+                mainContent = `
+                    <div class="cook-step-container">
+                        <div class="cook-step-number">Step ${cookModeStep + 1} of ${totalSteps}</div>
+                        <div class="cook-step-text">${currentInstruction}</div>
+                    </div>
+                    <div class="cook-step-nav">
+                        <button class="cook-step-btn" onclick="cookModeNav(-1)" ${cookModeStep === 0 ? 'disabled' : ''}>←</button>
+                        <button class="cook-step-btn" onclick="cookModeNav(1)" ${cookModeStep === totalSteps - 1 ? 'disabled' : ''}>→</button>
+                    </div>
+                `;
+            } else {
+                // Full recipe view
+                mainContent = `
+                    <div class="card-section-title">Instructions</div>
+                    <ol class="card-list" style="font-size: 1.1rem; line-height: 1.8;">
+                        ${r.instructions.map((inst, i) => `<li style="margin-bottom:12px; padding:8px; background:${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'}; border-radius:8px;">${inst}</li>`).join('')}
+                    </ol>
+                `;
+            }
+            
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <div class="card-title" style="font-size:1.4rem; margin:0;">${r.title}</div>
+                    <button onclick="closeCookMode()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-muted);">✕</button>
+                </div>
+                
+                ${viewToggle}
+                ${ingredientsDrawer}
+                ${mainContent}
+                
+                <div style="text-align:center; margin-top:25px;">
+                    <button onclick="closeCookMode()" class="action-btn" style="background:#666; border-color:#444;">Exit Cook Mode</button>
+                </div>
+            `;
+        }
+
+        function setCookView(view) {
+            cookModeView = view;
+            renderCookMode();
+        }
+
+        function toggleCookIngredients() {
+            ingredientsOpen = !ingredientsOpen;
+            renderCookMode();
+        }
+
+        function cookModeNav(dir) {
+            const totalSteps = cookModeRecipe.instructions.length;
+            cookModeStep = Math.max(0, Math.min(totalSteps - 1, cookModeStep + dir));
+            renderCookMode();
+        }
+
+        function closeCookMode() {
+            document.body.classList.remove('cook-mode-active');
+            document.getElementById('cookModeModal').classList.remove('show');
+            cookModeRecipe = null;
         }
 
         // --- MEAL PLANNER ---
@@ -1072,6 +1292,7 @@ ${transcript}`;
 
         // --- UTILS ---
         function toggleCookMode() {
+            // Legacy function - now handled by openCookMode
             document.body.classList.toggle('cook-mode-active');
             if (navigator.wakeLock && document.body.classList.contains('cook-mode-active')) {
                 navigator.wakeLock.request('screen').catch(console.error);
