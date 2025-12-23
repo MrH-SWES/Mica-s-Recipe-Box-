@@ -1,2753 +1,1014 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mica's Recipe Box</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            font-family: 'Courier Prime', 'Courier New', monospace;
-            background: linear-gradient(to bottom, #B8D4C8 0%, #A8CCC0 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background 0.3s, color 0.3s;
-            touch-action: pan-y;
-        }
-
-        body.cook-mode-active {
-            background: #1a1a1a;
-            color: #f0f0f0;
-        }
-
-        .header {
-            background: #98BCB0;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: background 0.3s;
-        }
-
-        body.cook-mode-active .header {
-            background: #2a2a2a;
-        }
-
-        .header h1 {
-            font-family: 'Special Elite', monospace;
-            color: #2a3a2a;
-            font-size: 1.8rem;
-            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
-            transition: color 0.3s;
-        }
-
-        body.cook-mode-active .header h1 {
-            color: #f4c430;
-            text-shadow: none;
-        }
-
-        /* --- TABS --- */
-        .main-tabs {
-            display: flex;
-            background: #88ada1;
-            position: sticky;
-            top: 58px;
-            z-index: 99;
-        }
-
-        body.cook-mode-active .main-tabs {
-            background: #333;
-        }
-
-        .main-tab {
-            flex: 1;
-            padding: 12px 8px;
-            text-align: center;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            font-size: 0.85rem;
-            color: #2a3a2a;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 3px solid transparent;
-        }
-
-        body.cook-mode-active .main-tab {
-            color: #aaa;
-        }
-
-        .main-tab.active {
-            background: rgba(255,255,255,0.2);
-            border-bottom-color: #f4c430;
-            color: #2a3a2a;
-        }
-
-        body.cook-mode-active .main-tab.active {
-            color: #f4c430;
-            background: rgba(244,196,48,0.1);
-        }
-
-        .main-tab-icon {
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        /* --- TAB CONTENT --- */
-        .tab-content {
-            display: none;
-            padding-bottom: 80px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* --- CONTROLS BAR --- */
-        .controls-bar {
-            background: rgba(184, 212, 200, 0.95);
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            flex-wrap: wrap;
-            transition: background 0.3s;
-        }
-
-        body.cook-mode-active .controls-bar {
-            background: rgba(42, 42, 42, 0.95);
-        }
-
-        .control-btn {
-            flex: 1;
-            min-width: 70px;
-            padding: 10px 6px;
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.75rem;
-            font-weight: bold;
-            background: #fdfbf7;
-            color: #5a4a3a;
-            border: 2px solid #d4c5a9;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            transition: all 0.3s;
-        }
-
-        body.cook-mode-active .control-btn {
-            background: #3a3a3a;
-            color: #f0f0f0;
-            border-color: #555;
-        }
-
-        .control-btn-icon {
-            font-size: 1.1rem;
-        }
-
-        .control-btn.active {
-            background: #f4c430;
-            color: #1a1a1a;
-            border-color: #f4c430;
-        }
-
-        /* --- COOK MODE TOGGLE --- */
-        .cook-toggle-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #fdfbf7;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 2px solid #d4c5a9;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        body.cook-mode-active .cook-toggle-wrapper {
-            background: #f4c430;
-            border-color: #f4c430;
-        }
-
-        .cook-label {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #5a4a3a;
-            white-space: nowrap;
-        }
-
-        body.cook-mode-active .cook-label {
-            color: #1a1a1a;
-        }
-
-        .cook-toggle {
-            width: 44px;
-            height: 24px;
-            background: #ccc;
-            border-radius: 12px;
-            position: relative;
-            transition: background 0.3s;
-        }
-
-        body.cook-mode-active .cook-toggle {
-            background: #5a4a3a;
-        }
-
-        .cook-toggle-slider {
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        body.cook-mode-active .cook-toggle-slider {
-            transform: translateX(20px);
-        }
-
-        /* --- DROPDOWNS --- */
-        .dropdown-menu {
-            display: none;
-            background: #fdfbf7;
-            border: 2px solid #d4c5a9;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 0 12px 10px;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        body.cook-mode-active .dropdown-menu {
-            background: #2a2a2a;
-            border-color: #555;
-        }
-
-        .dropdown-menu.show {
-            display: flex;
-        }
-
-        .chip {
-            background: #e0e0e0;
-            color: #2a3a2a;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        body.cook-mode-active .chip {
-            background: #444;
-            color: #f0f0f0;
-        }
-
-        .chip.active {
-            background: #f4c430;
-            color: white;
-        }
-
-        /* --- SWIPE CONTAINER --- */
-        .swipe-container {
-            position: relative;
-            overflow: hidden;
-            touch-action: pan-y;
-        }
-
-        .recipe-container {
-            padding: 15px;
-            max-width: 600px;
-            margin: 0 auto;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-        }
-
-        .recipe-container.swiping-left {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-
-        .recipe-container.swiping-right {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-
-        /* --- SWIPE HINTS --- */
-        .swipe-hint {
-            text-align: center;
-            padding: 8px;
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        body.cook-mode-active .swipe-hint {
-            color: #888;
-        }
-
-        /* --- RECIPE CARD --- */
-        .recipe-card {
-            background: #fdfbf7;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            padding: 20px;
-            border: 2px solid #d4c5a9;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        body.cook-mode-active .recipe-card {
-            background: #2a2a2a;
-            border-color: #555;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-        }
-
-        .recipe-photo {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 3px solid #e8e4dc;
-        }
-
-        body.cook-mode-active .recipe-photo {
-            border-color: #555;
-        }
-
-        .recipe-title {
-            font-family: 'Special Elite', monospace;
-            font-size: 1.5rem;
-            color: #5a4a3a;
-            margin-bottom: 8px;
-            text-align: center;
-            transition: color 0.3s, font-size 0.3s;
-        }
-
-        body.cook-mode-active .recipe-title {
-            color: #f4c430;
-            font-size: 1.8rem;
-        }
-
-        .recipe-desc {
-            font-style: italic;
-            color: #666;
-            text-align: center;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            font-size: 0.9rem;
-        }
-
-        body.cook-mode-active .recipe-desc {
-            color: #aaa;
-        }
-
-        .section-title {
-            border-bottom: 2px solid #d4c5a9;
-            margin: 15px 0 10px 0;
-            padding-bottom: 5px;
-            color: #5a4a3a;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        body.cook-mode-active .section-title {
-            color: #f4c430;
-            border-color: #555;
-            font-size: 1.2rem;
-        }
-
-        .ingredients-list { list-style: none; }
-
-        .ingredients-list li {
-            padding: 10px;
-            margin-bottom: 6px;
-            background: #f9f7f3;
-            border-left: 4px solid #f4c430;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-            font-size: 0.95rem;
-        }
-
-        body.cook-mode-active .ingredients-list li {
-            background: #3a3a3a;
-            font-size: 1.1rem;
-            padding: 12px;
-        }
-
-        .ingredients-list li.checked {
-            opacity: 0.5;
-            text-decoration: line-through;
-            background: #e0e0e0;
-            border-left-color: #a8ccc0;
-        }
-
-        body.cook-mode-active .ingredients-list li.checked {
-            background: #222;
-        }
-
-        /* --- SERVING ADJUSTER --- */
-        .serving-adjuster {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 12px 0;
-            padding: 10px;
-            background: #f0ebe0;
-            border-radius: 8px;
-        }
-
-        body.cook-mode-active .serving-adjuster {
-            background: #333;
-        }
-
-        .serving-adjuster label {
-            font-weight: bold;
-            color: #5a4a3a;
-            font-size: 0.9rem;
-        }
-
-        body.cook-mode-active .serving-adjuster label {
-            color: #f0f0f0;
-        }
-
-        .serving-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid #d4c5a9;
-            background: #fff;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        body.cook-mode-active .serving-btn {
-            background: #444;
-            color: #f0f0f0;
-            border-color: #666;
-        }
-
-        .serving-count {
-            font-size: 1.2rem;
-            font-weight: bold;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        /* --- STEP-BY-STEP MODE --- */
-        .instructions { padding-left: 15px; line-height: 1.5; }
-        .instructions li { margin-bottom: 8px; font-size: 0.95rem; }
-
-        body.cook-mode-active .instructions li {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            margin-bottom: 12px;
-        }
-
-        .step-by-step-container { display: none; }
-
-        body.cook-mode-active .step-by-step-container {
-            display: block;
-        }
-
-        body.cook-mode-active .instructions-normal {
-            display: none;
-        }
-
-        .step-card {
-            background: #3a3a3a;
-            border: 3px solid #f4c430;
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
-            min-height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .step-number {
-            background: #f4c430;
-            color: #1a1a1a;
-            font-size: 1.3rem;
-            font-weight: bold;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .step-text {
-            font-size: 1.3rem;
-            line-height: 1.5;
-            color: #f0f0f0;
-        }
-
-        .step-nav {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .step-nav button {
-            padding: 10px 25px;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            font-size: 1rem;
-            border: 2px solid #f4c430;
-            border-radius: 8px;
-            background: transparent;
-            color: #f4c430;
-            cursor: pointer;
-        }
-
-        .step-nav button:disabled {
-            opacity: 0.3;
-        }
-
-        .step-progress {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 8px;
-        }
-
-        /* --- TIMER BUTTON --- */
-        .timer-btn {
-            display: inline-block;
-            background: #f4c430;
-            color: #1a1a1a;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
-            margin-left: 6px;
-            border: none;
-            font-family: 'Courier Prime', monospace;
-        }
-
-        .timer-btn.active {
-            background: #e57373;
-            color: white;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* --- TIMER MODAL --- */
-        .timer-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #2a2a2a;
-            border: 3px solid #f4c430;
-            border-radius: 16px;
-            padding: 25px;
-            z-index: 3000;
-            text-align: center;
-            min-width: 260px;
-        }
-
-        .timer-modal.show { display: block; }
-
-        .timer-display {
-            font-size: 3.5rem;
-            font-family: 'Special Elite', monospace;
-            color: #f4c430;
-            margin: 15px 0;
-        }
-
-        .timer-label {
-            color: #aaa;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .timer-controls button {
-            padding: 10px 18px;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            border: 2px solid #f4c430;
-            border-radius: 8px;
-            background: transparent;
-            color: #f4c430;
-            cursor: pointer;
-        }
-
-        .timer-controls button.stop {
-            border-color: #e57373;
-            color: #e57373;
-        }
-
-        .timer-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 2999;
-        }
-
-        .timer-overlay.show { display: block; }
-
-        /* --- FAVORITES --- */
-        .favorite-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255,255,255,0.9);
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .favorite-btn.favorited {
-            background: #f4c430;
-        }
-
-        /* --- ACTION BUTTONS --- */
-        .action-btn {
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-        }
-
-        .add-to-shopping-btn {
-            background: #a8ccc0;
-            color: white;
-        }
-
-        .add-to-meal-btn {
-            background: #f4c430;
-            color: #1a1a1a;
-        }
-
-        .edit-btn {
-            background: #d4c5a9;
-            color: #5a4a3a;
-        }
-
-        body.cook-mode-active .edit-btn {
-            background: #3a3a3a;
-            color: #f0f0f0;
-        }
-
-        .recipe-count {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        .tag-chip {
-            background: #f4c430;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            margin: 2px;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        /* --- MEAL PLANNER (HOME TAB) --- */
-        .meal-planner-home {
-            padding: 15px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .planner-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .planner-title {
-            font-family: 'Special Elite', monospace;
-            font-size: 1.3rem;
-            color: #5a4a3a;
-        }
-
-        body.cook-mode-active .planner-title {
-            color: #f4c430;
-        }
-
-        .planner-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .planner-action-btn {
-            padding: 8px 12px;
-            font-size: 0.8rem;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .generate-list-btn {
-            background: #f4c430;
-            color: #1a1a1a;
-        }
-
-        .clear-plan-btn {
-            background: #e0e0e0;
-            color: #5a4a3a;
-        }
-
-        .meal-day-card {
-            background: #fdfbf7;
-            border: 2px solid #d4c5a9;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        body.cook-mode-active .meal-day-card {
-            background: #2a2a2a;
-            border-color: #444;
-        }
-
-        .meal-day-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .meal-day-name {
-            font-weight: bold;
-            color: #5a4a3a;
-            font-size: 1rem;
-        }
-
-        body.cook-mode-active .meal-day-name {
-            color: #f0f0f0;
-        }
-
-        .add-meal-btn {
-            padding: 6px 12px;
-            background: #a8ccc0;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .meal-day-recipes {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            min-height: 30px;
-        }
-
-        .meal-recipe-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #f4c430;
-            color: #1a1a1a;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .meal-recipe-chip button {
-            background: none;
-            border: none;
-            color: #1a1a1a;
-            cursor: pointer;
-            font-size: 1rem;
-            line-height: 1;
-        }
-
-        .empty-day {
-            color: #999;
-            font-style: italic;
-            font-size: 0.85rem;
-        }
-
-        /* Recipe selector */
-        .recipe-selector-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .recipe-selector-modal.show {
-            display: block;
-        }
-
-        .recipe-selector-content {
-            background: #fdfbf7;
-            margin: 50px auto;
-            padding: 20px;
-            max-width: 400px;
-            border-radius: 12px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .recipe-selector-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-
-        .recipe-selector-item:hover {
-            background: #f4c430;
-            color: white;
-        }
-
-        /* --- SHOPPING TAB --- */
-        .shopping-container {
-            padding: 15px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .shopping-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .shopping-title {
-            font-family: 'Special Elite', monospace;
-            font-size: 1.3rem;
-            color: #5a4a3a;
-        }
-
-        body.cook-mode-active .shopping-title {
-            color: #f4c430;
-        }
-
-        .shopping-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .shopping-action-btn {
-            padding: 8px 10px;
-            font-size: 0.75rem;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .copy-btn { background: #a8ccc0; color: white; }
-        .print-btn { background: #5a9fd4; color: white; }
-        .clear-btn { background: #e57373; color: white; }
-
-        /* Add custom item */
-        .add-custom-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 15px;
-        }
-
-        .add-custom-row input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #d4c5a9;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .add-custom-row select {
-            padding: 10px;
-            border: 2px solid #d4c5a9;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            max-width: 100px;
-        }
-
-        .add-custom-row button {
-            padding: 10px 14px;
-            background: #a8ccc0;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Aisle groups */
-        .aisle-group {
-            margin-bottom: 15px;
-        }
-
-        .aisle-header {
-            background: #88ada1;
-            color: white;
-            padding: 8px 12px;
-            font-weight: bold;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-
-        body.cook-mode-active .aisle-header {
-            background: #4a6a5a;
-        }
-
-        .shopping-item {
-            padding: 10px;
-            background: #fdfbf7;
-            border-left: 4px solid #d4c5a9;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        body.cook-mode-active .shopping-item {
-            background: #2a2a2a;
-        }
-
-        .shopping-item.checked {
-            opacity: 0.5;
-            text-decoration: line-through;
-        }
-
-        .shopping-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        .shopping-item-text { flex: 1; }
-
-        .shopping-item-sources {
-            font-size: 0.7rem;
-            color: #888;
-        }
-
-        .shopping-item-delete {
-            background: none;
-            border: none;
-            cursor: pointer;
-            opacity: 0.5;
-            font-size: 1.2rem;
-        }
-
-        /* Pantry section */
-        .pantry-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #d4c5a9;
-        }
-
-        .pantry-title {
-            font-weight: bold;
-            color: #5a4a3a;
-            margin-bottom: 10px;
-        }
-
-        body.cook-mode-active .pantry-title {
-            color: #f0f0f0;
-        }
-
-        .pantry-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .pantry-chip {
-            background: #e8e4dc;
-            padding: 6px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        body.cook-mode-active .pantry-chip {
-            background: #3a3a3a;
-            color: #f0f0f0;
-        }
-
-        .pantry-chip button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            opacity: 0.6;
-        }
-
-        .add-pantry-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .add-pantry-row input {
-            flex: 1;
-            padding: 8px;
-            border: 2px solid #d4c5a9;
-            border-radius: 6px;
-            font-family: inherit;
-        }
-
-        .add-pantry-row button {
-            padding: 8px 14px;
-            background: #d4c5a9;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* --- MEAL SELECTION HINT --- */
-        .meal-selection-hint {
-            background: #f4c430;
-            color: #1a1a1a;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .meal-selection-hint button {
-            background: rgba(0,0,0,0.2);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #1a1a1a;
-        }
-
-        /* --- MODALS --- */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .modal.show { display: block; }
-
-        .modal-content { 
-            background: #fdfbf7; 
-            margin: 20px auto; 
-            padding: 20px; 
-            max-width: 450px; 
-            border-radius: 12px; 
-        }
-
-        .modal-content h2 {
-            margin-bottom: 15px;
-            color: #5a4a3a;
-            font-family: 'Special Elite', monospace;
-        }
-
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; }
-        .form-group input, .form-group textarea, .form-group select { 
-            width: 100%; 
-            padding: 10px; 
-            font-family: inherit; 
-            border: 2px solid #d4c5a9; 
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        .form-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .save-btn { background: #a8ccc0; color: white; flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .cancel-btn { background: #ccc; flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; }
-        .delete-btn { width: 100%; margin-top: 10px; background: #e57373; border: none; padding: 10px; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        .loading { text-align: center; margin-top: 50px; font-size: 1.1rem; color: #5a4a3a; }
-
-        body.cook-mode-active .loading { color: #aaa; }
-        
-        .spinner-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .spinner-overlay.show {
-            display: flex;
-        }
-
-        /* --- BOTTOM NAV --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #98BCB0;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 200;
-        }
-
-        body.cook-mode-active .bottom-nav {
-            background: #2a2a2a;
-        }
-
-        .bottom-nav-btn {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #2a3a2a;
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
-        body.cook-mode-active .bottom-nav-btn {
-            color: #aaa;
-        }
-
-        .bottom-nav-btn.active {
-            color: #f4c430;
-        }
-
-        .bottom-nav-icon {
-            font-size: 1.4rem;
-            margin-bottom: 2px;
-        }
-
-        .bottom-nav-badge {
-            position: absolute;
-            top: 2px;
-            right: calc(50% - 18px);
-            background: #e57373;
-            color: white;
-            font-size: 0.65rem;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Print styles */
-        @media print {
-            .bottom-nav, .controls-bar, .main-tabs, .header, .shopping-actions, .add-custom-row, .pantry-section { display: none !important; }
-            body { background: white !important; }
-            .shopping-container { padding: 0; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <h1>Mica's Recipe Box</h1>
-    </div>
-
-    <!-- Main Tabs -->
-    <div class="main-tabs">
-        <button class="main-tab active" onclick="switchMainTab('planner')">
-            <span class="main-tab-icon">📅</span>
-            Plan
-        </button>
-        <button class="main-tab" onclick="switchMainTab('recipes')">
-            <span class="main-tab-icon">📖</span>
-            Recipes
-        </button>
-        <button class="main-tab" onclick="switchMainTab('shopping')">
-            <span class="main-tab-icon">🛒</span>
-            Shop
-        </button>
-    </div>
-
-    <!-- PLANNER TAB -->
-    <div class="tab-content active" id="tab-planner">
-        <div class="meal-planner-home">
-            <div class="planner-header">
-                <div class="planner-title">📅 This Week's Meals</div>
-                <div class="planner-actions">
-                    <button class="planner-action-btn generate-list-btn" onclick="generateListFromPlan()">🛒 Shop</button>
-                    <button class="planner-action-btn clear-plan-btn" onclick="clearMealPlan()">Clear</button>
-                </div>
-            </div>
-            <div id="mealPlannerGrid"></div>
-        </div>
-    </div>
-
-    <!-- RECIPES TAB -->
-    <div class="tab-content" id="tab-recipes">
-        <div class="controls-bar">
-            <button class="control-btn" onclick="toggleDropdown('filter')">
-                <span class="control-btn-icon">🏷️</span>
-                <span id="filterBtnText">Filter</span>
-            </button>
-            <button class="control-btn" onclick="toggleDropdown('sort')">
-                <span class="control-btn-icon">↕️</span>
-                <span id="sortBtnText">A-Z</span>
-            </button>
-            <button class="control-btn" onclick="surpriseMe()">
-                <span class="control-btn-icon">🎲</span>
-                Surprise!
-            </button>
-            <div class="cook-toggle-wrapper" onclick="toggleCookMode()">
-                <span class="cook-label">🍳 Cook</span>
-                <div class="cook-toggle" id="cookToggle">
-                    <div class="cook-toggle-slider"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="dropdown-menu" id="filterDropdown"></div>
-        <div class="dropdown-menu" id="sortDropdown">
-            <button class="chip active" onclick="applySort('alpha')">A → Z</button>
-            <button class="chip" onclick="applySort('alpha-desc')">Z → A</button>
-            <button class="chip" onclick="applySort('recent')">Recent</button>
-            <button class="chip" onclick="applySort('favorites')">★ First</button>
-        </div>
-
-        <div class="swipe-hint">← Swipe to browse recipes →</div>
-
-        <div class="swipe-container" id="swipeContainer">
-            <div class="recipe-container" id="recipeContainer">
-                <div class="loading">Loading Recipes...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SHOPPING TAB -->
-    <div class="tab-content" id="tab-shopping">
-        <div class="shopping-container">
-            <div class="shopping-header">
-                <div class="shopping-title">🛒 Shopping List</div>
-                <div class="shopping-actions">
-                    <button class="shopping-action-btn copy-btn" onclick="copyShoppingList()">📋</button>
-                    <button class="shopping-action-btn print-btn" onclick="printShoppingList()">🖨️</button>
-                    <button class="shopping-action-btn clear-btn" onclick="clearShoppingList()">🗑️</button>
-                </div>
-            </div>
-
-            <div class="add-custom-row">
-                <input type="text" id="customItemInput" placeholder="Add item...">
-                <select id="customItemAisle">
-                    <option value="other">Other</option>
-                    <option value="produce">Produce</option>
-                    <option value="dairy">Dairy</option>
-                    <option value="meat">Meat</option>
-                    <option value="bakery">Bakery</option>
-                    <option value="frozen">Frozen</option>
-                    <option value="pantry">Pantry</option>
-                    <option value="spices">Spices</option>
-                </select>
-                <button onclick="addCustomItem()">+</button>
-            </div>
-
-            <div id="shoppingListContent">
-                <p style="color:#888; text-align:center;">No items yet!</p>
-            </div>
-
-            <div class="pantry-section">
-                <div class="pantry-title">🏠 Pantry Staples (auto-skip)</div>
-                <div class="pantry-items" id="pantryStaples"></div>
-                <div class="add-pantry-row">
-                    <input type="text" id="newPantryItem" placeholder="Add staple...">
-                    <button onclick="addPantryStaple()">+</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <button class="bottom-nav-btn active" onclick="switchMainTab('planner')" id="nav-planner">
-            <span class="bottom-nav-icon">📅</span>
-            Plan
-        </button>
-        <button class="bottom-nav-btn" onclick="switchMainTab('recipes')" id="nav-recipes">
-            <span class="bottom-nav-icon">📖</span>
-            Recipes
-        </button>
-        <button class="bottom-nav-btn" onclick="openModal()" id="nav-add">
-            <span class="bottom-nav-icon">➕</span>
-            Add
-        </button>
-        <button class="bottom-nav-btn" onclick="switchMainTab('shopping')" id="nav-shopping" style="position:relative;">
-            <span class="bottom-nav-icon">🛒</span>
-            Shop
-            <span class="bottom-nav-badge" id="shoppingBadge" style="display:none;">0</span>
-        </button>
-    </div>
-
-    <!-- Recipe Modal -->
-    <div class="modal" id="recipeModal">
-        <div class="modal-content">
-            <h2 id="modalTitle">Add Recipe</h2>
-            <form id="recipeForm" onsubmit="saveRecipe(event)">
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="inpTitle" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="inpDesc" rows="2"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Servings</label>
-                    <input type="number" id="inpServings" min="1" value="4">
-                </div>
-                <div class="form-group">
-                    <label>Photo</label>
-                    <input type="file" id="inpPhoto" accept="image/*" onchange="compressAndPreview(event)">
-                    <img id="imgPreview" style="max-width:100%; margin-top:8px; display:none; border-radius:6px;">
-                </div>
-                <div class="form-group">
-                    <label>Ingredients (one per line)</label>
-                    <textarea id="inpIng" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Instructions (one per line)</label>
-                    <textarea id="inpInst" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Tags (comma separated)</label>
-                    <input type="text" id="inpTags" placeholder="dinner, quick, spicy">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="save-btn">Save</button>
-                </div>
-                <button type="button" class="delete-btn" id="btnDelete" onclick="deleteRecipe()" style="display:none;">Delete Recipe</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Recipe Selector Modal -->
-    <div class="recipe-selector-modal" id="recipeSelectorModal">
-        <div class="recipe-selector-content">
-            <h3 style="margin-bottom:15px; color:#5a4a3a;">Select a Recipe</h3>
-            <div id="recipeSelectorList"></div>
-            <button class="cancel-btn" style="width:100%; margin-top:15px;" onclick="closeRecipeSelector()">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Timer Modal -->
-    <div class="timer-overlay" id="timerOverlay" onclick="closeTimerModal()"></div>
-    <div class="timer-modal" id="timerModal">
-        <div class="timer-label" id="timerLabel">Timer</div>
-        <div class="timer-display" id="timerDisplay">00:00</div>
-        <div class="timer-controls">
-            <button onclick="pauseTimer()" id="pauseBtn">Pause</button>
-            <button class="stop" onclick="stopTimer()">Stop</button>
-        </div>
-    </div>
-    
-    <div class="spinner-overlay" id="spinner">
-        <h2 style="color:#5a4a3a;">Saving...</h2>
-    </div>
-
-    <audio id="timerSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ck4N0ZWBqeIuap6OXiXpsY2JtfI2dpqOZi3xsYmNufI+fpqSainttY2NufZGhqKWbinxsY2RwgJSkqqadint" type="audio/wav">
-    </audio>
-
-    <script>
-        // CONFIGURATION
-        const BIN_ID = "6947951243b1c97be9fc48e7"; 
-        const API_KEY = "$2a$10$qZdFvBQfv93zCuJiPDIln.ui9ln3pOufUtcpIivYnUQdJmakpBmWe"; 
-
-        let allRecipes = [];
-        let displayedRecipes = [];
-        let currentIndex = 0;
-        let editingIndex = -1; 
-        let currentFilter = 'All'; 
-        let currentSort = 'alpha';
-        let wakeLock = null;
-        let cookModeActive = false;
-        
-        // Safe localStorage helper - handles browser-level corruption
-        function safeGetStorage(key, defaultValue) {
-            try {
-                const data = localStorage.getItem(key);
-                if (!data) return defaultValue;
-                return JSON.parse(data);
-            } catch (e) {
-                console.warn(`Storage error for ${key}:`, e.message);
-                return defaultValue;
-            }
-        }
-        
-        function safeSetStorage(key, value) {
-            try {
-                localStorage.setItem(key, JSON.stringify(value));
-            } catch (e) {
-                console.warn(`Could not save ${key}:`, e.message);
-            }
-        }
-
-        // Data - with fallbacks
-        let shoppingList = [];
-        let favorites = [];
-        let pantryStaples = ['salt', 'pepper', 'olive oil', 'butter', 'water'];
-        let mealPlan = {};
-        
-        // Try to load saved data
-        try {
-            shoppingList = safeGetStorage('micaShoppingList2', []);
-            if (!Array.isArray(shoppingList)) shoppingList = [];
-        } catch(e) { shoppingList = []; }
-        
-        try {
-            favorites = safeGetStorage('micaFavorites', []);
-            if (!Array.isArray(favorites)) favorites = [];
-        } catch(e) { favorites = []; }
-        
-        try {
-            pantryStaples = safeGetStorage('micaPantry', ['salt', 'pepper', 'olive oil', 'butter', 'water']);
-            if (!Array.isArray(pantryStaples)) pantryStaples = ['salt', 'pepper', 'olive oil', 'butter', 'water'];
-        } catch(e) { pantryStaples = ['salt', 'pepper', 'olive oil', 'butter', 'water']; }
-        
-        try {
-            mealPlan = safeGetStorage('micaMealPlan', {});
-            if (typeof mealPlan !== 'object' || mealPlan === null) mealPlan = {};
-        } catch(e) { mealPlan = {}; }
-        
-        // Timer
-        let timerInterval = null;
-        let timerSeconds = 0;
-        let timerPaused = false;
-        let activeTimerBtn = null;
-
-        // Step-by-step
-        let currentStep = 0;
-        let servingMultiplier = 1;
-
-        // Swipe
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let isSwiping = false;
-
-        // Recipe selector
-        let selectorDay = null;
-        let pendingMealDay = null;
-
-        const AISLES = {
-            produce: { name: 'Produce', icon: '🥬', keywords: ['lettuce','tomato','celery','potato','apple','banana','lemon','lime','orange','avocado','cucumber','spinach','kale','broccoli','mushroom','zucchini','squash','corn','pea','cilantro','parsley','basil','mint','ginger','jalapeño','bell pepper','green onion','scallion','shallot','cabbage','arugula','bok choy','leek','radish','beet','asparagus','artichoke','eggplant','fennel','turnip','rutabaga','plantain','mango','pineapple','melon','berry','grape','peach','plum','pear','kiwi','papaya','coconut','fresh herb','fresh thyme','fresh rosemary','fresh sage','fresh dill','fresh mint','fresh basil','fresh cilantro','fresh parsley'] },
-            dairy: { name: 'Dairy & Eggs', icon: '🥛', keywords: ['milk','cream','cheese','yogurt','butter','egg','sour cream','ricotta','mozzarella','parmesan','cheddar','feta','cream cheese','heavy cream','half and half','cottage cheese','brie','gouda','swiss','provolone','goat cheese','mascarpone','ghee'] },
-            meat: { name: 'Meat & Seafood', icon: '🥩', keywords: ['chicken','beef','pork','turkey','lamb','bacon','sausage','ham','steak','ground beef','ground turkey','ground pork','fish','salmon','tuna','shrimp','crab','lobster','scallop','clam','mussel','oyster','anchovy','sardine','tilapia','cod','halibut','mahi','prosciutto','pancetta','chorizo','pepperoni','salami','deli meat','hot dog','brisket','ribs','thigh','breast','drumstick','wing'] },
-            bakery: { name: 'Bakery', icon: '🍞', keywords: ['bread','baguette','bagel','tortilla','pita','croissant','muffin','naan','roll','ciabatta','focaccia','sourdough','rye bread','english muffin','hamburger bun','hot dog bun','dinner roll','crouton','breadcrumb','puff pastry','pie crust','phyllo'] },
-            frozen: { name: 'Frozen', icon: '🧊', keywords: ['frozen','ice cream','popsicle','frozen fruit','frozen vegetable','frozen pizza','frozen dinner'] },
-            pantry: { name: 'Pantry', icon: '🥫', keywords: ['flour','sugar','rice','pasta','noodle','broth','stock','tomato sauce','marinara','coconut milk','olive oil','vegetable oil','canola oil','sesame oil','vinegar','apple cider vinegar','balsamic','rice vinegar','red wine vinegar','soy sauce','fish sauce','oyster sauce','hoisin','honey','maple syrup','molasses','agave','peanut butter','almond butter','cereal','oat','oatmeal','cornstarch','baking soda','baking powder','yeast','cocoa','chocolate chip','nut','almond','walnut','pecan','cashew','pistachio','pine nut','peanut','sunflower seed','sesame seed','chia seed','flax','quinoa','couscous','lentil','chickpea','black bean','kidney bean','pinto bean','white bean','canned tomato','diced tomato','crushed tomato','tomato paste','canned corn','canned bean','coconut cream','evaporated milk','condensed milk','jam','jelly','preserve','syrup','cracker','chip','pretzel','popcorn','granola','dried fruit','raisin','cranberry','date','fig','apricot'] },
-            spices: { name: 'Spices', icon: '🧂', keywords: ['salt','pepper','cumin','paprika','oregano','thyme','rosemary','sage','dill','cinnamon','nutmeg','cayenne','chili powder','curry','turmeric','vanilla','seasoning','spice','coriander','cardamom','clove','allspice','bay leaf','basil','marjoram','tarragon','fennel seed','mustard seed','celery seed','poppy seed','caraway','saffron','sumac','za\'atar','garam masala','five spice','italian seasoning','herbs de provence','old bay','tajin','everything bagel','red pepper flake','crushed red pepper','black pepper','white pepper','garlic salt','onion salt','seasoned salt','msg','bouillon','extract','food coloring'] },
-            condiments: { name: 'Condiments', icon: '🍯', keywords: ['mustard','dijon','ketchup','mayo','mayonnaise','relish','hot sauce','sriracha','worcestershire','bbq','barbecue','salsa','hummus','tahini','teriyaki','buffalo','ranch','blue cheese dressing','italian dressing','caesar dressing','vinaigrette','aioli','pesto','chimichurri','gochujang','sambal','harissa','chutney','pickle','caper','olive','sun-dried tomato','roasted red pepper','anchovy paste','miso','tamari','liquid amino','bragg'] },
-            other: { name: 'Other', icon: '📦', keywords: [] }
-        };
-
-        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
-        // --- INIT ---
-        async function init() {
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-                const data = await res.json();
-                
-                allRecipes = Array.isArray(data.record) ? data.record : [];
-                
-                allRecipes.forEach((r, i) => {
-                    if (!r.id) r.id = 'recipe_' + Date.now() + '_' + i;
-                    if (!r.addedAt) r.addedAt = Date.now();
-                    if (!r.servings) r.servings = 4;
-                });
-                
-                if (allRecipes.length === 0) {
-                    document.getElementById('recipeContainer').innerHTML = `<div class="loading">No recipes yet. Tap + to add one!</div>`;
-                } else {
-                    applySortAndFilter();
-                    renderFilters(); 
-                    renderRecipe();
-                }
-                updateShoppingBadge();
-                renderMealPlanner();
-                renderPantryStaples();
-                renderShoppingList();
-                setupSwipeListeners();
-            } catch (err) {
-                console.error(err);
-                document.getElementById('recipeContainer').innerHTML = `<div class="loading">Error loading. Check connection.</div>`;
-            }
-        }
-
-        async function pushToCloud() {
-            document.getElementById('spinner').classList.add('show');
-            try {
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY 
-                    },
-                    body: JSON.stringify(allRecipes)
-                });
-            } catch(e) {
-                alert("Error saving!");
-            }
-            document.getElementById('spinner').classList.remove('show');
-        }
-
-        // --- SWIPE NAVIGATION ---
-        function setupSwipeListeners() {
-            const container = document.getElementById('swipeContainer');
-            
-            container.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-                isSwiping = false;
-            }, { passive: true });
-
-            container.addEventListener('touchmove', (e) => {
-                const diff = e.changedTouches[0].screenX - touchStartX;
-                if (Math.abs(diff) > 30) {
-                    isSwiping = true;
-                }
-            }, { passive: true });
-
-            container.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, { passive: true });
-        }
-
-        function handleSwipe() {
-            const diff = touchStartX - touchEndX;
-            const threshold = 80;
-            
-            if (Math.abs(diff) < threshold) return;
-            
-            const recipeEl = document.getElementById('recipeContainer');
-            
-            if (diff > 0) {
-                // Swipe left - next
-                recipeEl.classList.add('swiping-left');
-                setTimeout(() => {
-                    navigate(1);
-                    recipeEl.classList.remove('swiping-left');
-                }, 200);
-            } else {
-                // Swipe right - prev
-                recipeEl.classList.add('swiping-right');
-                setTimeout(() => {
-                    navigate(-1);
-                    recipeEl.classList.remove('swiping-right');
-                }, 200);
-            }
-        }
-
-        // --- TAB SWITCHING ---
-        function switchMainTab(tab) {
-            // Clear meal selection if leaving recipes tab
-            if (tab !== 'recipes' && pendingMealDay) {
-                cancelMealSelection();
-            }
-            
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.querySelector(`.main-tab[onclick*="${tab}"]`).classList.add('active');
-            document.getElementById('nav-' + tab).classList.add('active');
-        }
-
-        // --- COOK MODE ---
-        async function toggleCookMode() {
-            cookModeActive = !cookModeActive;
-            document.body.classList.toggle('cook-mode-active', cookModeActive);
-            currentStep = 0;
-            
-            if (cookModeActive) {
-                try {
-                    if ('wakeLock' in navigator) {
-                        wakeLock = await navigator.wakeLock.request('screen');
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            } else {
-                if (wakeLock) {
-                    await wakeLock.release();
-                    wakeLock = null;
-                }
-            }
-            renderRecipe();
-        }
-
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible' && cookModeActive) {
-                wakeLock = await navigator.wakeLock.request('screen');
-            }
-        });
-
-        // --- SURPRISE ME ---
-        function surpriseMe() {
-            if (allRecipes.length === 0) return;
-            
-            const randomIdx = Math.floor(Math.random() * allRecipes.length);
-            const recipe = allRecipes[randomIdx];
-            
-            // Reset filter to show all
-            currentFilter = 'All';
-            applySortAndFilter();
-            
-            // Find the recipe in displayed
-            currentIndex = displayedRecipes.findIndex(r => r.id === recipe.id);
-            if (currentIndex === -1) currentIndex = 0;
-            
-            // Ensure we're on recipes tab
-            switchMainTab('recipes');
-            
-            // Animate
-            const recipeEl = document.getElementById('recipeContainer');
-            recipeEl.style.transform = 'scale(0.8)';
-            recipeEl.style.opacity = '0';
-            
-            setTimeout(() => {
-                renderRecipe();
-                recipeEl.style.transform = 'scale(1)';
-                recipeEl.style.opacity = '1';
-            }, 200);
-        }
-
-        // --- DROPDOWNS ---
-        function toggleDropdown(type) {
-            const filterEl = document.getElementById('filterDropdown');
-            const sortEl = document.getElementById('sortDropdown');
-            
-            if (type === 'filter') {
-                filterEl.classList.toggle('show');
-                sortEl.classList.remove('show');
-            } else {
-                sortEl.classList.toggle('show');
-                filterEl.classList.remove('show');
-            }
-        }
-
-        // --- SORTING ---
-        function applySort(sortType) {
-            currentSort = sortType;
-            
-            const labels = { 'alpha': 'A-Z', 'alpha-desc': 'Z-A', 'recent': 'New', 'favorites': '★' };
-            document.getElementById('sortBtnText').textContent = labels[sortType];
-            
-            document.querySelectorAll('#sortDropdown .chip').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            applySortAndFilter();
-            renderRecipe();
-            document.getElementById('sortDropdown').classList.remove('show');
-        }
-
-        function applySortAndFilter() {
-            if (currentFilter === 'All') {
-                displayedRecipes = [...allRecipes];
-            } else if (currentFilter === 'Favorites') {
-                displayedRecipes = allRecipes.filter(r => favorites.includes(r.id));
-            } else {
-                displayedRecipes = allRecipes.filter(r => 
-                    r.tags && r.tags.map(t => t.trim()).includes(currentFilter)
-                );
-            }
-            
-            switch(currentSort) {
-                case 'alpha':
-                    displayedRecipes.sort((a, b) => a.title.localeCompare(b.title));
-                    break;
-                case 'alpha-desc':
-                    displayedRecipes.sort((a, b) => b.title.localeCompare(a.title));
-                    break;
-                case 'recent':
-                    displayedRecipes.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
-                    break;
-                case 'favorites':
-                    displayedRecipes.sort((a, b) => {
-                        const aFav = favorites.includes(a.id) ? 1 : 0;
-                        const bFav = favorites.includes(b.id) ? 1 : 0;
-                        if (bFav !== aFav) return bFav - aFav;
-                        return a.title.localeCompare(b.title);
-                    });
-                    break;
-            }
-        }
-
-        // --- FILTER ---
-        function renderFilters() {
-            const dropdown = document.getElementById('filterDropdown');
-            const tags = new Set();
-            
-            allRecipes.forEach(r => {
-                if(r.tags) r.tags.forEach(t => tags.add(t.trim()));
-            });
-
-            let html = `<button class="chip ${currentFilter === 'All' ? 'active' : ''}" onclick="applyFilter('All')">All</button>`;
-            html += `<button class="chip ${currentFilter === 'Favorites' ? 'active' : ''}" onclick="applyFilter('Favorites')">★ Faves</button>`;
-            
-            Array.from(tags).sort().forEach(tag => {
-                if(tag) {
-                    html += `<button class="chip ${currentFilter === tag ? 'active' : ''}" onclick="applyFilter('${tag}')">${tag}</button>`;
-                }
-            });
-
-            dropdown.innerHTML = html;
-        }
-
-        function applyFilter(tag) {
-            currentFilter = tag;
-            document.getElementById('filterBtnText').textContent = tag === 'All' ? 'Filter' : tag;
-            
-            currentIndex = 0;
-            applySortAndFilter();
-            renderFilters(); 
-            renderRecipe();
-            document.getElementById('filterDropdown').classList.remove('show');
-        }
-
-        // --- FAVORITES ---
-        function toggleFavorite(recipeId) {
-            const idx = favorites.indexOf(recipeId);
-            if (idx === -1) favorites.push(recipeId);
-            else favorites.splice(idx, 1);
-            safeSetStorage('micaFavorites', favorites);
-            renderRecipe();
-        }
-
-        // --- SERVING ADJUSTER ---
-        function adjustServings(delta) {
-            const r = displayedRecipes[currentIndex];
-            const baseServings = r.servings || 4;
-            const currentServings = Math.round(baseServings * servingMultiplier);
-            const newServings = Math.max(1, currentServings + delta);
-            servingMultiplier = newServings / baseServings;
-            renderRecipe();
-        }
-
-        // --- INGREDIENT PARSING ---
-        // Common prep words to strip when matching
-        const PREP_WORDS = ['chopped', 'diced', 'minced', 'sliced', 'crushed', 'grated', 'shredded', 'peeled', 'cubed', 'julienned', 'quartered', 'halved', 'whole', 'fresh', 'dried', 'frozen', 'canned', 'raw', 'cooked', 'roasted', 'toasted', 'melted', 'softened', 'finely', 'roughly', 'thinly', 'thickly', 'to taste', 'optional', 'divided', 'plus more', 'for serving', 'for garnish', 'packed', 'sifted', 'beaten', 'at room temperature', 'cut into wedges', 'cut into chunks', 'cut into pieces'];
-        
-        // Words that indicate variety (keep these to distinguish items)
-        const VARIETY_WORDS = ['white', 'red', 'yellow', 'green', 'black', 'brown', 'purple', 'sweet', 'hot', 'mild', 'italian', 'greek', 'french', 'kosher', 'sea', 'light', 'dark', 'virgin', 'extra-virgin', 'unsalted', 'salted', 'whole wheat', 'all-purpose'];
-
-        function parseIngredient(text) {
-            const original = text.trim();
-            const lower = original.toLowerCase();
-            
-            const match = original.match(/^([\d\/\.\-\s]+)?\s*(cup|cups|tbsp|tablespoon|tablespoons|tsp|teaspoon|teaspoons|oz|ounce|ounces|lb|lbs|pound|pounds|g|gram|grams|kg|ml|liter|liters|can|cans|bunch|bunches|clove|cloves|piece|pieces|slice|slices|large|medium|small|whole|head|heads|stalk|stalks|sprig|sprigs|pinch|dash)?\s*(.+)?/i);
-            
-            let qty = '', unit = '', item = original;
-            
-            if (match) {
-                qty = (match[1] || '').trim();
-                unit = (match[2] || '').trim().toLowerCase();
-                item = (match[3] || original).trim();
-            }
-            
-            // Normalize unit
-            const unitMap = {
-                'tablespoon': 'tbsp', 'tablespoons': 'tbsp',
-                'teaspoon': 'tsp', 'teaspoons': 'tsp',
-                'ounce': 'oz', 'ounces': 'oz',
-                'pound': 'lb', 'pounds': 'lb', 'lbs': 'lb',
-                'cup': 'cups', 'can': 'cans', 'clove': 'cloves',
-                'slice': 'slices', 'piece': 'pieces', 'bunch': 'bunches'
-            };
-            unit = unitMap[unit] || unit;
-            
-            // Extract core ingredient for matching
-            const coreIngredient = extractCoreIngredient(item);
-            
-            // Determine aisle - special rules first, then keywords
-            let aisle = 'other';
-            
-            // Special rules for common mismatches
-            if (lower.includes('powder') || lower.includes('ground ') || lower.includes('dried ') || lower.includes(' dried')) {
-                aisle = 'spices';
-            } else if (lower.includes('fresh ') && (lower.includes('herb') || lower.includes('thyme') || lower.includes('rosemary') || lower.includes('sage') || lower.includes('dill') || lower.includes('basil') || lower.includes('cilantro') || lower.includes('parsley') || lower.includes('mint'))) {
-                aisle = 'produce';
-            } else if (lower.includes('mustard') || lower.includes('dijon') || lower.includes('ketchup') || lower.includes('mayo') || lower.includes('aioli') || lower.includes('pesto')) {
-                aisle = 'condiments';
-            } else if (lower.includes('onion') && !lower.includes('powder') && !lower.includes('salt') && !lower.includes('flake')) {
-                aisle = 'produce';
-            } else if (lower.includes('garlic') && !lower.includes('powder') && !lower.includes('salt') && !lower.includes('granulated')) {
-                aisle = 'produce';
-            } else if (lower.includes('pepper') && (lower.includes('bell') || lower.includes('jalapeño') || lower.includes('serrano') || lower.includes('poblano') || lower.includes('habanero') || lower.includes('anaheim'))) {
-                aisle = 'produce';
-            } else if (lower.includes('carrot') || lower.includes('celery')) {
-                aisle = 'produce';
-            } else if (lower.includes('bean') && (lower.includes('green') || lower.includes('string') || lower.includes('snap'))) {
-                aisle = 'produce';
-            } else {
-                // Fall back to keyword matching
-                const aisleCheckOrder = ['spices', 'condiments', 'meat', 'dairy', 'bakery', 'frozen', 'pantry', 'produce'];
-                for (const key of aisleCheckOrder) {
-                    const data = AISLES[key];
-                    if (data && data.keywords.some(kw => {
-                        const regex = new RegExp(`\\b${kw}\\b`, 'i');
-                        return regex.test(lower);
-                    })) {
-                        aisle = key;
-                        break;
-                    }
-                }
-            }
-            
-            return { original, qty, unit, item, aisle, lower, coreIngredient };
-        }
-
-        function extractCoreIngredient(item) {
-            let core = item.toLowerCase();
-            
-            // Remove text in parentheses
-            core = core.replace(/\([^)]*\)/g, '');
-            
-            // Remove prep words
-            PREP_WORDS.forEach(word => {
-                core = core.replace(new RegExp(`\\b${word}\\b`, 'gi'), '');
-            });
-            
-            // Remove "and" and commas
-            core = core.replace(/\band\b/g, '').replace(/,/g, '');
-            
-            // Clean up extra spaces
-            core = core.replace(/\s+/g, ' ').trim();
-            
-            return core;
-        }
-
-        function getIngredientMatchKey(parsed) {
-            let key = parsed.coreIngredient;
-            
-            // Check for variety words to keep red onion separate from white onion
-            const itemLower = parsed.item.toLowerCase();
-            VARIETY_WORDS.forEach(variety => {
-                if (itemLower.includes(variety) && !key.includes(variety)) {
-                    key = variety + ' ' + key;
-                }
-            });
-            
-            // Add unit to key so we don't combine different units
-            if (parsed.unit) {
-                key += '|' + parsed.unit;
-            }
-            
-            // Ensure we never return an empty key
-            if (!key || key === '|' || key.trim() === '') {
-                key = 'item_' + Math.random().toString(36).substr(2, 9);
-            }
-            
-            return key.toLowerCase().trim();
-        }
-
-        function aggregateShoppingList(items) {
-            const aggregated = {};
-            
-            items.forEach((item, originalIdx) => {
-                // Handle different possible item structures
-                if (!item || typeof item !== 'object') return;
-                
-                // Get the text to parse - could be in different fields
-                let textToParse = '';
-                if (typeof item === 'string') {
-                    textToParse = item;
-                } else if (item.original) {
-                    textToParse = item.original;
-                } else if (item.item) {
-                    textToParse = item.item;
-                } else if (item.displayItem) {
-                    textToParse = item.displayItem;
-                } else if (item.text) {
-                    textToParse = item.text;
-                }
-                
-                // If still no text, create a fallback
-                if (!textToParse) {
-                    textToParse = 'Unknown item';
-                }
-                
-                const parsed = parseIngredient(textToParse);
-                const key = getIngredientMatchKey(parsed);
-                
-                // Get quantity - could be stored differently
-                const itemQty = item.qty !== undefined ? item.qty : parsed.qty;
-                
-                if (!aggregated[key]) {
-                    aggregated[key] = {
-                        displayItem: parsed.coreIngredient || parsed.item || textToParse,
-                        qty: parseQuantity(itemQty?.toString() || '0'),
-                        unit: parsed.unit || item.unit || '',
-                        aisle: item.aisle || parsed.aisle || 'other',
-                        checked: item.checked || false,
-                        sources: [...(item.sources || [])],
-                        originalIndices: [originalIdx],
-                        varieties: new Set()
-                    };
-                    
-                    // Track variety
-                    const itemLower = (parsed.item || '').toLowerCase();
-                    VARIETY_WORDS.forEach(v => {
-                        if (itemLower.includes(v)) aggregated[key].varieties.add(v);
-                    });
-                    
-                } else {
-                    // Combine quantities
-                    aggregated[key].qty += parseQuantity(itemQty?.toString() || '0');
-                    
-                    // Track original indices for checking off
-                    aggregated[key].originalIndices.push(originalIdx);
-                    
-                    // Combine sources
-                    (item.sources || []).forEach(s => {
-                        if (!aggregated[key].sources.includes(s)) {
-                            aggregated[key].sources.push(s);
-                        }
-                    });
-                    
-                    // If any instance is unchecked, keep unchecked
-                    if (!item.checked) {
-                        aggregated[key].checked = false;
-                    }
-                }
-            });
-            
-            // Convert to array
-            return Object.entries(aggregated).map(([key, data]) => {
-                let displayName = data.displayItem;
-                if (data.varieties.size > 0) {
-                    const varietyStr = Array.from(data.varieties).join('/');
-                    if (!displayName.toLowerCase().includes(varietyStr.toLowerCase())) {
-                        displayName = varietyStr + ' ' + displayName;
-                    }
-                }
-                
-                return {
-                    ...data,
-                    displayItem: displayName.charAt(0).toUpperCase() + displayName.slice(1),
-                    varieties: Array.from(data.varieties),
-                    key: key
-                };
-            });
-        }
-
-        function parseQuantity(qtyStr) {
-            if (!qtyStr) return 0;
-            qtyStr = qtyStr.toString().trim();
-            
-            if (qtyStr.includes('/')) {
-                const parts = qtyStr.split(/\s+/);
-                let total = 0;
-                for (const p of parts) {
-                    if (p.includes('/')) {
-                        const [num, den] = p.split('/');
-                        total += parseFloat(num) / parseFloat(den);
-                    } else if (!isNaN(parseFloat(p))) {
-                        total += parseFloat(p);
-                    }
-                }
-                return total || 0;
-            }
-            
-            if (qtyStr.includes('-')) {
-                const [low, high] = qtyStr.split('-');
-                return (parseFloat(low) + parseFloat(high)) / 2;
-            }
-            
-            return parseFloat(qtyStr) || 0;
-        }
-
-        function formatQuantity(num) {
-            if (num === 0) return '';
-            if (num === Math.floor(num)) return num.toString();
-            
-            const fractions = [[0.125, '⅛'], [0.25, '¼'], [0.33, '⅓'], [0.375, '⅜'], [0.5, '½'], [0.625, '⅝'], [0.66, '⅔'], [0.75, '¾'], [0.875, '⅞']];
-            const whole = Math.floor(num);
-            const frac = num - whole;
-            
-            let fracStr = '';
-            for (const [val, str] of fractions) {
-                if (Math.abs(frac - val) < 0.08) { fracStr = str; break; }
-            }
-            
-            if (fracStr) return whole > 0 ? `${whole}${fracStr}` : fracStr;
-            return num.toFixed(1).replace(/\.0$/, '');
-        }
-
-        function isPantryStaple(item) {
-            const lower = item.toLowerCase();
-            return pantryStaples.some(s => lower.includes(s.toLowerCase()) || s.toLowerCase().includes(lower));
-        }
-
-        // --- RENDER RECIPE ---
-        function renderRecipe() {
-            const container = document.getElementById('recipeContainer');
-            
-            if (displayedRecipes.length === 0) {
-                container.innerHTML = `<div class="loading">No recipes found.</div>`;
-                return;
-            }
-
-            if (currentIndex >= displayedRecipes.length) currentIndex = 0;
-            if (currentIndex < 0) currentIndex = displayedRecipes.length - 1;
-
-            const r = displayedRecipes[currentIndex];
-            const realIndex = allRecipes.indexOf(r);
-            const isFavorite = favorites.includes(r.id);
-            const baseServings = r.servings || 4;
-            const currentServings = Math.round(baseServings * servingMultiplier);
-
-            // Scale ingredients
-            const scaledIngredients = r.ingredients.map(ing => {
-                const parsed = parseIngredient(ing);
-                if (parsed.qty && servingMultiplier !== 1) {
-                    const scaled = parseQuantity(parsed.qty) * servingMultiplier;
-                    return `${formatQuantity(scaled)} ${parsed.unit} ${parsed.item}`.trim();
-                }
-                return ing;
-            });
-
-            const ingHtml = scaledIngredients.map(ing => 
-                `<li onclick="this.classList.toggle('checked')">${ing}</li>`
-            ).join('');
-
-            // Instructions with timers
-            const instructions = r.instructions.map((step, i) => {
-                const timerMatch = step.match(/(\d+)\s*(minute|min|hour|hr)s?/i);
-                let timerBtn = '';
-                if (timerMatch) {
-                    let seconds = parseInt(timerMatch[1]);
-                    if (timerMatch[2].toLowerCase().startsWith('hour') || timerMatch[2].toLowerCase().startsWith('hr')) {
-                        seconds *= 3600;
-                    } else {
-                        seconds *= 60;
-                    }
-                    timerBtn = `<button class="timer-btn" onclick="event.stopPropagation(); startTimer(${seconds}, '${step.substring(0, 25).replace(/'/g, "\\'")}...', this)">⏱️ ${timerMatch[1]}${timerMatch[2][0]}</button>`;
-                }
-                return { text: step, timer: timerBtn, index: i + 1 };
-            });
-
-            const instHtml = instructions.map(inst => 
-                `<li><strong>${inst.index}.</strong> ${inst.text} ${inst.timer}</li>`
-            ).join('');
-
-            const stepByStepHtml = cookModeActive ? `
-                <div class="step-by-step-container">
-                    <div class="step-card">
-                        <div class="step-number">${currentStep + 1}</div>
-                        <div class="step-text">${instructions[currentStep]?.text || ''}</div>
-                        ${instructions[currentStep]?.timer ? `<div>${instructions[currentStep].timer}</div>` : ''}
-                    </div>
-                    <div class="step-nav">
-                        <button onclick="prevStep()" ${currentStep === 0 ? 'disabled' : ''}>← Prev</button>
-                        <button onclick="nextStep()" ${currentStep >= instructions.length - 1 ? 'disabled' : ''}>Next →</button>
-                    </div>
-                    <div class="step-progress">Step ${currentStep + 1} of ${instructions.length}</div>
-                </div>
-            ` : '';
-            
-            const tagsHtml = (r.tags || []).map(t => 
-                `<span class="tag-chip" onclick="applyFilter('${t.trim()}')">${t}</span>`
-            ).join('');
-            
-            const imageHtml = r.photo ? `<img src="${r.photo}" class="recipe-photo">` : '';
-
-            // Add to meal plan button (conditional)
-            const addToMealBtn = pendingMealDay 
-                ? `<button class="action-btn add-to-meal-btn" onclick="addCurrentRecipeToMealPlan()">📅 Add to ${pendingMealDay}</button>`
-                : '';
-
-            container.innerHTML = `
-                <div class="recipe-card">
-                    <button class="favorite-btn ${isFavorite ? 'favorited' : ''}" onclick="toggleFavorite('${r.id}')">
-                        ${isFavorite ? '★' : '☆'}
-                    </button>
-                    ${imageHtml}
-                    <h2 class="recipe-title">${r.title}</h2>
-                    <p class="recipe-desc">${r.description || ''}</p>
-                    <div style="text-align:center; margin-bottom:10px;">${tagsHtml}</div>
-                    
-                    <div class="serving-adjuster">
-                        <label>Servings:</label>
-                        <button class="serving-btn" onclick="adjustServings(-1)">−</button>
-                        <span class="serving-count">${currentServings}</span>
-                        <button class="serving-btn" onclick="adjustServings(1)">+</button>
-                    </div>
-                    
-                    <h3 class="section-title">Ingredients</h3>
-                    <ul class="ingredients-list">${ingHtml}</ul>
-                    <h3 class="section-title">Instructions</h3>
-                    ${stepByStepHtml}
-                    <ul class="instructions instructions-normal" style="list-style:none;">${instHtml}</ul>
-                    ${addToMealBtn}
-                    <button class="action-btn add-to-shopping-btn" onclick="addRecipeToShoppingList('${r.id}')">🛒 Add to Shopping List</button>
-                    <button class="action-btn edit-btn" onclick="editRecipe(${realIndex})">Edit Recipe</button>
-                    <div class="recipe-count">Recipe ${currentIndex + 1} of ${displayedRecipes.length}</div>
-                </div>
-            `;
-        }
-
-        function navigate(direction) {
-            currentIndex += direction;
-            currentStep = 0;
-            servingMultiplier = 1;
-            renderRecipe();
-        }
-
-        function nextStep() {
-            const r = displayedRecipes[currentIndex];
-            if (currentStep < r.instructions.length - 1) {
-                currentStep++;
-                renderRecipe();
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 0) {
-                currentStep--;
-                renderRecipe();
-            }
-        }
-
-        // --- TIMER ---
-        function startTimer(seconds, label, btnElement) {
-            if (timerInterval) stopTimer();
-            
-            timerSeconds = seconds;
-            timerPaused = false;
-            activeTimerBtn = btnElement;
-            if (btnElement) btnElement.classList.add('active');
-            
-            document.getElementById('timerLabel').textContent = label;
-            updateTimerDisplay();
-            
-            document.getElementById('timerOverlay').classList.add('show');
-            document.getElementById('timerModal').classList.add('show');
-            document.getElementById('pauseBtn').textContent = 'Pause';
-            
-            timerInterval = setInterval(() => {
-                if (!timerPaused) {
-                    timerSeconds--;
-                    updateTimerDisplay();
-                    if (timerSeconds <= 0) timerComplete();
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const mins = Math.floor(timerSeconds / 60);
-            const secs = timerSeconds % 60;
-            document.getElementById('timerDisplay').textContent = 
-                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function pauseTimer() {
-            timerPaused = !timerPaused;
-            document.getElementById('pauseBtn').textContent = timerPaused ? 'Resume' : 'Pause';
-        }
-
-        function stopTimer() {
-            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-            if (activeTimerBtn) { activeTimerBtn.classList.remove('active'); activeTimerBtn = null; }
-            closeTimerModal();
-        }
-
-        function closeTimerModal() {
-            document.getElementById('timerOverlay').classList.remove('show');
-            document.getElementById('timerModal').classList.remove('show');
-        }
-
-        function timerComplete() {
-            stopTimer();
-            try { document.getElementById('timerSound').play(); } catch(e) {}
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
-            alert("⏱️ Timer Complete!");
-        }
-
-        // --- MEAL PLANNER ---
-        function renderMealPlanner() {
-            const grid = document.getElementById('mealPlannerGrid');
-            
-            grid.innerHTML = DAYS.map(day => {
-                const recipes = mealPlan[day] || [];
-                const recipesHtml = recipes.length > 0 
-                    ? recipes.map((id, idx) => {
-                        const r = allRecipes.find(x => x.id === id);
-                        if (!r) return '';
-                        return `<span class="meal-recipe-chip">${r.title}<button onclick="event.stopPropagation(); removeMealRecipe('${day}', ${idx})">×</button></span>`;
-                    }).join('')
-                    : '<span class="empty-day">Tap + to add a meal</span>';
-                
-                return `
-                    <div class="meal-day-card">
-                        <div class="meal-day-header">
-                            <span class="meal-day-name">${day}</span>
-                            <button class="add-meal-btn" onclick="goToRecipesForDay('${day}')">+ Add</button>
-                        </div>
-                        <div class="meal-day-recipes">${recipesHtml}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function goToRecipesForDay(day) {
-            pendingMealDay = day;
-            switchMainTab('recipes');
-            // Show a hint that we're selecting for a day
-            showAddToMealHint(day);
-        }
-
-        function showAddToMealHint(day) {
-            // Remove existing hint if any
-            const existingHint = document.querySelector('.meal-selection-hint');
-            if (existingHint) existingHint.remove();
-            
-            const hint = document.createElement('div');
-            hint.className = 'meal-selection-hint';
-            hint.innerHTML = `
-                <span>Adding to <strong>${day}</strong></span>
-                <button onclick="cancelMealSelection()">✕ Cancel</button>
-            `;
-            document.getElementById('tab-recipes').insertBefore(hint, document.getElementById('tab-recipes').firstChild);
-        }
-
-        function cancelMealSelection() {
-            pendingMealDay = null;
-            const hint = document.querySelector('.meal-selection-hint');
-            if (hint) hint.remove();
-        }
-
-        function addCurrentRecipeToMealPlan() {
-            if (!pendingMealDay || displayedRecipes.length === 0) return;
-            
-            const recipe = displayedRecipes[currentIndex];
-            if (!mealPlan[pendingMealDay]) mealPlan[pendingMealDay] = [];
-            mealPlan[pendingMealDay].push(recipe.id);
-            safeSetStorage('micaMealPlan', mealPlan);
-            
-            // Show confirmation
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✓ Added!';
-            btn.style.background = '#4CAF50';
-            
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.background = '';
-            }, 1500);
-            
-            renderMealPlanner();
-        }
-
-        function openRecipeSelector(day) {
-            selectorDay = day;
-            const list = document.getElementById('recipeSelectorList');
-            list.innerHTML = allRecipes.map(r => 
-                `<div class="recipe-selector-item" onclick="addMealRecipe('${day}', '${r.id}')">${r.title}</div>`
-            ).join('');
-            document.getElementById('recipeSelectorModal').classList.add('show');
-        }
-
-        function closeRecipeSelector() {
-            document.getElementById('recipeSelectorModal').classList.remove('show');
-        }
-
-        function addMealRecipe(day, recipeId) {
-            if (!mealPlan[day]) mealPlan[day] = [];
-            mealPlan[day].push(recipeId);
-            safeSetStorage('micaMealPlan', mealPlan);
-            renderMealPlanner();
-            closeRecipeSelector();
-        }
-
-        function removeMealRecipe(day, idx) {
-            mealPlan[day].splice(idx, 1);
-            safeSetStorage('micaMealPlan', mealPlan);
-            renderMealPlanner();
-        }
-
-        function generateListFromPlan() {
-            const recipeIds = Object.values(mealPlan).flat();
-            if (recipeIds.length === 0) {
-                alert('Add some meals to your plan first!');
-                return;
-            }
-            
-            shoppingList = [];
-            
-            recipeIds.forEach(recipeId => {
-                const recipe = allRecipes.find(r => r.id === recipeId);
-                if (!recipe) return;
-                
-                recipe.ingredients.forEach(ing => {
-                    const parsed = parseIngredient(ing);
-                    if (isPantryStaple(parsed.item || ing)) return;
-                    
-                    const qty = parseQuantity(parsed.qty);
-                    
-                    // Store original text for better aggregation
-                    shoppingList.push({
-                        original: ing,
-                        item: parsed.item,
-                        qty: qty,
-                        unit: parsed.unit,
-                        aisle: parsed.aisle,
-                        checked: false,
-                        sources: [recipe.title]
-                    });
-                });
-            });
-            
-            safeSetStorage('micaShoppingList2', shoppingList);
-            updateShoppingBadge();
-            renderShoppingList();
-            switchMainTab('shopping');
-            alert(`Shopping list generated from ${recipeIds.length} meals!`);
-        }
-
-        function clearMealPlan() {
-            if (confirm('Clear the meal plan?')) {
-                mealPlan = {};
-                safeSetStorage('micaMealPlan', mealPlan);
-                renderMealPlanner();
-            }
-        }
-
-        // --- SHOPPING LIST ---
-        function addRecipeToShoppingList(recipeId) {
-            const recipe = allRecipes.find(r => r.id === recipeId);
-            if (!recipe) return;
-            
-            recipe.ingredients.forEach(ing => {
-                const parsed = parseIngredient(ing);
-                if (isPantryStaple(parsed.item || ing)) return;
-                
-                let qty = parseQuantity(parsed.qty) * servingMultiplier;
-                
-                // Store the original text for better aggregation later
-                shoppingList.push({
-                    original: ing,
-                    item: parsed.item,
-                    qty: qty,
-                    unit: parsed.unit,
-                    aisle: parsed.aisle,
-                    checked: false,
-                    sources: [recipe.title]
-                });
-            });
-            
-            safeSetStorage('micaShoppingList2', shoppingList);
-            updateShoppingBadge();
-            
-            const btn = event.target;
-            btn.textContent = '✓ Added!';
-            btn.style.background = '#4CAF50';
-            setTimeout(() => {
-                btn.textContent = '🛒 Add to Shopping List';
-                btn.style.background = '';
-            }, 1500);
-        }
-
-        function addCustomItem() {
-            const input = document.getElementById('customItemInput');
-            const aisle = document.getElementById('customItemAisle').value;
-            const text = input.value.trim();
-            if (!text) return;
-            
-            const parsed = parseIngredient(text);
-            shoppingList.push({
-                item: parsed.item || text,
-                qty: parseQuantity(parsed.qty) || '',
-                unit: parsed.unit || '',
-                aisle: aisle,
-                checked: false,
-                sources: ['Custom']
-            });
-            
-            safeSetStorage('micaShoppingList2', shoppingList);
-            input.value = '';
-            updateShoppingBadge();
-            renderShoppingList();
-        }
-
-        function updateShoppingBadge() {
-            if (!Array.isArray(shoppingList)) {
-                shoppingList = [];
-            }
-            const unchecked = shoppingList.filter(i => i && !i.checked).length;
-            const badge = document.getElementById('shoppingBadge');
-            badge.textContent = unchecked;
-            badge.style.display = unchecked > 0 ? 'flex' : 'none';
-        }
-
-        function renderShoppingList() {
-            const content = document.getElementById('shoppingListContent');
-            
-            if (!Array.isArray(shoppingList) || shoppingList.length === 0) {
-                content.innerHTML = `<p style="color:#888; text-align:center;">No items yet!</p>`;
-                return;
-            }
-            
-            // Aggregate similar ingredients
-            const aggregatedItems = aggregateShoppingList(shoppingList);
-            
-            if (!aggregatedItems || aggregatedItems.length === 0) {
-                content.innerHTML = `<p style="color:#888; text-align:center;">No items to display.</p>`;
-                return;
-            }
-            
-            // Group by aisle
-            const byAisle = {};
-            aggregatedItems.forEach(item => {
-                const aisle = item.aisle || 'other';
-                if (!byAisle[aisle]) byAisle[aisle] = [];
-                byAisle[aisle].push(item);
-            });
-            
-            const aisleOrder = ['produce', 'dairy', 'meat', 'bakery', 'frozen', 'pantry', 'spices', 'condiments', 'other'];
-            
-            let html = '';
-            aisleOrder.forEach(aisleKey => {
-                if (!byAisle[aisleKey] || byAisle[aisleKey].length === 0) return;
-                
-                const aisle = AISLES[aisleKey];
-                const items = byAisle[aisleKey];
-                
-                html += `<div class="aisle-group">
-                    <div class="aisle-header">
-                        <span>${aisle.icon} ${aisle.name}</span>
-                        <span>${items.filter(i => !i.checked).length}</span>
-                    </div>`;
-                
-                items.forEach(item => {
-                    const qtyStr = item.qty ? formatQuantity(item.qty) : '';
-                    const displayText = [qtyStr, item.unit, item.displayItem].filter(Boolean).join(' ');
-                    // Store indices as data attribute for toggling
-                    const indicesStr = item.originalIndices.join(',');
-                    
-                    html += `<div class="shopping-item ${item.checked ? 'checked' : ''}" onclick="toggleAggregatedItem('${indicesStr}')">
-                        <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleAggregatedItem('${indicesStr}')">
-                        <div class="shopping-item-text">
-                            ${displayText}
-                            ${item.sources?.length ? `<div class="shopping-item-sources">${item.sources.join(', ')}</div>` : ''}
-                        </div>
-                        <button class="shopping-item-delete" onclick="event.stopPropagation(); removeAggregatedItem('${indicesStr}')">×</button>
-                    </div>`;
-                });
-                
-                html += `</div>`;
-            });
-            
-            if (!html) {
-                content.innerHTML = `<p style="color:#888; text-align:center;">No items to display.</p>`;
-                return;
-            }
-            
-            content.innerHTML = html;
-        }
-
-        function toggleAggregatedItem(indicesStr) {
-            const indices = indicesStr.split(',').map(Number);
-            // Check if all are currently checked
-            const allChecked = indices.every(idx => shoppingList[idx]?.checked);
-            // Toggle all to opposite state
-            indices.forEach(idx => {
-                if (shoppingList[idx]) {
-                    shoppingList[idx].checked = !allChecked;
-                }
-            });
-            safeSetStorage('micaShoppingList2', shoppingList);
-            updateShoppingBadge();
-            renderShoppingList();
-        }
-
-        function removeAggregatedItem(indicesStr) {
-            const indices = indicesStr.split(',').map(Number).sort((a, b) => b - a); // Sort descending to remove from end first
-            indices.forEach(idx => {
-                shoppingList.splice(idx, 1);
-            });
-            safeSetStorage('micaShoppingList2', shoppingList);
-            updateShoppingBadge();
-            renderShoppingList();
-        }
-
-        function toggleShoppingItem(idx) {
-            shoppingList[idx].checked = !shoppingList[idx].checked;
-            safeSetStorage('micaShoppingList2', shoppingList);
-            updateShoppingBadge();
-            renderShoppingList();
-        }
-
-        function removeShoppingItem(idx) {
-            shoppingList.splice(idx, 1);
-            safeSetStorage('micaShoppingList2', shoppingList);
-            updateShoppingBadge();
-            renderShoppingList();
-        }
-
-        function clearShoppingList() {
-            if (confirm('Clear the list?')) {
-                shoppingList = [];
-                safeSetStorage('micaShoppingList2', shoppingList);
-                updateShoppingBadge();
-                renderShoppingList();
-            }
-        }
-
-        function copyShoppingList() {
-            if (shoppingList.length === 0) return;
-            
-            const byAisle = {};
-            shoppingList.filter(i => !i.checked).forEach(item => {
-                const aisle = item.aisle || 'other';
-                if (!byAisle[aisle]) byAisle[aisle] = [];
-                byAisle[aisle].push(item);
-            });
-            
-            let text = "🛒 Shopping List\n\n";
-            Object.entries(byAisle).forEach(([key, items]) => {
-                const aisle = AISLES[key];
-                text += `${aisle.icon} ${aisle.name}\n`;
-                items.forEach(item => {
-                    const qtyStr = item.qty ? formatQuantity(item.qty) : '';
-                    text += `  ○ ${[qtyStr, item.unit, item.item].filter(Boolean).join(' ')}\n`;
-                });
-                text += '\n';
-            });
-            
-            navigator.clipboard.writeText(text).then(() => alert('Copied!'));
-        }
-
-        function printShoppingList() {
-            window.print();
-        }
-
-        // --- PANTRY ---
-        function renderPantryStaples() {
-            const container = document.getElementById('pantryStaples');
-            container.innerHTML = pantryStaples.length 
-                ? pantryStaples.map((item, idx) => 
-                    `<span class="pantry-chip">${item}<button onclick="removePantryStaple(${idx})">×</button></span>`
-                ).join('')
-                : '<span style="color:#888;">None yet</span>';
-        }
-
-        function addPantryStaple() {
-            const input = document.getElementById('newPantryItem');
-            const item = input.value.trim().toLowerCase();
-            if (!item || pantryStaples.includes(item)) { input.value = ''; return; }
-            
-            pantryStaples.push(item);
-            safeSetStorage('micaPantry', pantryStaples);
-            input.value = '';
-            renderPantryStaples();
-        }
-
-        function removePantryStaple(idx) {
-            pantryStaples.splice(idx, 1);
-            safeSetStorage('micaPantry', pantryStaples);
-            renderPantryStaples();
-        }
-
-        // --- FORMS ---
-        function openModal() {
-            editingIndex = -1;
-            document.getElementById('recipeForm').reset();
-            document.getElementById('inpServings').value = 4;
-            document.getElementById('imgPreview').style.display = 'none';
-            document.getElementById('btnDelete').style.display = 'none';
-            document.getElementById('modalTitle').innerText = "Add Recipe";
-            document.getElementById('recipeModal').classList.add('show');
-        }
-
-        function editRecipe(index) {
-            editingIndex = index;
-            const r = allRecipes[index];
-            document.getElementById('inpTitle').value = r.title;
-            document.getElementById('inpDesc').value = r.description || '';
-            document.getElementById('inpServings').value = r.servings || 4;
-            document.getElementById('inpIng').value = r.ingredients.join('\n');
-            document.getElementById('inpInst').value = r.instructions.join('\n');
-            document.getElementById('inpTags').value = (r.tags || []).join(', ');
-            if (r.photo) {
-                document.getElementById('imgPreview').src = r.photo;
-                document.getElementById('imgPreview').style.display = 'block';
-            } else {
-                document.getElementById('imgPreview').style.display = 'none';
-            }
-            document.getElementById('btnDelete').style.display = 'block';
-            document.getElementById('modalTitle').innerText = "Edit Recipe";
-            document.getElementById('recipeModal').classList.add('show');
-        }
-
-        function closeModal() { 
-            document.getElementById('recipeModal').classList.remove('show'); 
-        }
-
-        async function saveRecipe(e) {
-            e.preventDefault();
-            const newRecipe = {
-                id: editingIndex === -1 ? 'recipe_' + Date.now() : allRecipes[editingIndex].id,
-                title: document.getElementById('inpTitle').value,
-                description: document.getElementById('inpDesc').value,
-                servings: parseInt(document.getElementById('inpServings').value) || 4,
-                ingredients: document.getElementById('inpIng').value.split('\n').filter(x => x.trim()),
-                instructions: document.getElementById('inpInst').value.split('\n').filter(x => x.trim()),
-                tags: document.getElementById('inpTags').value.split(',').map(t => t.trim()).filter(t => t),
-                photo: document.getElementById('imgPreview').src !== "" && document.getElementById('imgPreview').style.display !== 'none' ? document.getElementById('imgPreview').src : "",
-                addedAt: editingIndex === -1 ? Date.now() : (allRecipes[editingIndex].addedAt || Date.now())
-            };
-
-            if (editingIndex === -1) allRecipes.push(newRecipe);
-            else allRecipes[editingIndex] = newRecipe;
-
-            closeModal();
-            applySortAndFilter();
-            renderFilters(); 
-            renderMealPlanner();
-            
-            if (editingIndex === -1) {
-                currentIndex = displayedRecipes.findIndex(r => r.id === newRecipe.id);
-                if (currentIndex === -1) currentIndex = 0;
-            }
-            
-            renderRecipe();
-            await pushToCloud(); 
-        }
-
-        async function deleteRecipe() {
-            if (confirm("Delete this recipe?")) {
-                const deletedId = allRecipes[editingIndex].id;
-                allRecipes.splice(editingIndex, 1);
-                
-                favorites = favorites.filter(id => id !== deletedId);
-                safeSetStorage('micaFavorites', favorites);
-                
-                Object.keys(mealPlan).forEach(day => {
-                    mealPlan[day] = mealPlan[day].filter(id => id !== deletedId);
-                });
-                safeSetStorage('micaMealPlan', mealPlan);
-                
-                currentIndex = 0;
-                closeModal();
-                applySortAndFilter();
-                renderFilters();
-                renderRecipe();
-                renderMealPlanner();
-                await pushToCloud();
-            }
-        }
-
-        function compressAndPreview(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800;
-                    const scale = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const preview = document.getElementById('imgPreview');
-                    preview.src = canvas.toDataURL('image/jpeg', 0.7);
-                    preview.style.display = 'block';
-                }
-            }
-        }
-
-        init();
-    </script>
-</body>
-</html>
+[
+  {
+    "title": "Perfect Protein Salad",
+    "description": "A hearty salad with spelt berries, garbanzo beans, and fresh veggies tossed in a creamy dill dressing.",
+    "photo": "",
+    "ingredients": [
+      "1 cup spelt berries",
+      "3 cups water",
+      "2 (14-ounce) cans garbanzo beans",
+      "1 English cucumber - peeled, seeded and diced",
+      "1 green bell pepper, seeds removed and diced",
+      "3 ribs celery, diced",
+      "1 carrot, peeled and diced",
+      "1/4 red onion, diced",
+      "1/2 bunch green onions, diagonally sliced",
+      "1/3 bunch parsley, chopped",
+      "1/2 cup mayonnaise (or vegan mayonnaise)",
+      "2 tablespoons lemon juice",
+      "2 tablespoons apple cider vinegar",
+      "1 teaspoon dried dill",
+      "1 teaspoon salt",
+      "1 teaspoon dried basil",
+      "1 teaspoon minced garlic"
+    ],
+    "instructions": [
+      "Boil spelt berries in water until tender, about 45 minutes. Drain and cool.",
+      "In a salad bowl, mix together cooked spelt, garbanzo beans, diced cucumbers, green peppers, celery, carrots, red onions, green onions and chopped parsley.",
+      "Mix together mayonnaise, lemon juice, vinegar, dill, salt, basil and garlic.",
+      "Pour dressing over salad, mixing well."
+    ],
+    "tags": [
+      "salad",
+      "vegetarian",
+      "healthy",
+      "dairy-free",
+      "nut-free",
+      "easy"
+    ]
+  },
+  {
+    "title": "Roasted Cauliflower with Tahini Sauce",
+    "description": "Roasted cauliflower, carrots, and onions tossed in a creamy tahini dressing. A crowd-pleasing vegan side dish.",
+    "photo": "",
+    "ingredients": [
+      "2 1/2 pounds cauliflower, crowns cut into florets",
+      "3 tablespoons olive oil, divided",
+      "1/2 teaspoon salt, plus extra for seasoning",
+      "1/2 pound carrots, peeled",
+      "1 red onion, cut into wedges",
+      "1/4 cup tahini",
+      "2 tablespoons lemon juice",
+      "2 tablespoons water",
+      "1/2 teaspoon black pepper",
+      "1 handful fresh Italian parsley, chopped"
+    ],
+    "instructions": [
+      "Preheat oven to 400° F.",
+      "Coat cauliflower florets with 1 tablespoon oil and salt lightly. Roast in oven until brown and soft, about 20 minutes. Do not undercook! Cool completely.",
+      "Cut carrots into wedges: Slice across at an angle, rotate carrot so that the cut is facing up and slice at an angle again along the cut.",
+      "Coat carrots and onions in 1 tablespoon oil and salt lightly. Roast in oven until soft, 10 to 12 minutes. Cool completely.",
+      "In a food processor or blender, mix tahini, lemon juice, water, 1 teaspoon salt, pepper and 1 tablespoon oil until dressing is blended.",
+      "Toss cooled, cooked vegetables with dressing. Garnish with chopped parsley. Adjust seasoning if necessary."
+    ],
+    "tags": [
+      "side dish",
+      "vegetarian",
+      "vegan",
+      "gluten-free",
+      "roasted",
+      "easy",
+      "dairy-free"
+    ]
+  },
+  {
+    "title": "Walnut Beet Salad",
+    "description": "A vibrant salad featuring tender beets, toasted walnuts, and a tangy balsamic Dijon dressing.",
+    "photo": "",
+    "ingredients": [
+      "3 pounds beets",
+      "1/4 cup balsamic vinegar",
+      "2 teaspoons Dijon mustard",
+      "1/2 teaspoon salt",
+      "1/2 teaspoon black pepper",
+      "1/4 cup walnut oil",
+      "1/2 cup walnuts",
+      "3/4 bunch green onions, sliced",
+      "1/4 red onion, sliced into thin half-moons"
+    ],
+    "instructions": [
+      "Steam or boil beets until fork tender, 20 to 40 minutes depending on the size of the beets.",
+      "Slip off skins under cool, running water while beets are still warm. Cut off root and stem ends. Cool in refrigerator.",
+      "Whisk together vinegar, mustard, salt, pepper and oil until dressing is blended.",
+      "Cut cooled, peeled beets into 1-inch wedges, preserving their round shape. Toss with dressing.",
+      "To toast walnuts, preheat oven to 350° F. Spread nuts on a baking sheet and toast for 4 to 5 minutes. Let cool. Roughly chop toasted walnuts.",
+      "Add walnuts, green onions and red onions to dressed beets; toss to combine."
+    ],
+    "tags": [
+      "salad",
+      "vegetarian",
+      "vegan",
+      "gluten-free",
+      "healthy",
+      "side dish"
+    ]
+  },
+  {
+    "title": "Chicken Salad",
+    "description": "A classic creamy chicken salad with crunch from celery and red onion, dressed in a lemon-Dijon mayonnaise.",
+    "photo": "",
+    "ingredients": [
+      "1 pound boneless skinless chicken breast",
+      "1/2 cup mayonnaise",
+      "1 teaspoon lemon juice",
+      "1 teaspoon Dijon mustard",
+      "1/2 teaspoon poultry seasoning (or a blend of ground sage, thyme, rosemary, marjoram, nutmeg, and black pepper)",
+      "Salt and black pepper, to taste",
+      "2 stalks celery, diced",
+      "1/4 red onion, diced",
+      "2 green onions, thinly sliced",
+      "1 tablespoon chopped Italian parsley"
+    ],
+    "instructions": [
+      "Preheat oven to 350° F.",
+      "Bake chicken for 25 minutes until the internal temperature reaches 165° F. Place chicken in the refrigerator and let cool.",
+      "Mix together mayonnaise, lemon juice, mustard and seasonings.",
+      "Dice chicken and combine with dressing and remaining ingredients. Chill before serving."
+    ],
+    "tags": [
+      "salad",
+      "lunch",
+      "chicken",
+      "gluten-free",
+      "dairy-free",
+      "easy"
+    ]
+  },
+  {
+    "title": "Freestyle Frittata",
+    "description": "The ultimate 'clean out the fridge' meal. This versatile base recipe uses a specific ratio of eggs to cream to create a fluffy texture, while the fillings are entirely up to you.",
+    "photo": "",
+    "ingredients": [
+      "8 large eggs",
+      "1/8 cup heavy cream",
+      "1/4 cup grated Parmesan cheese",
+      "2 teaspoons kosher salt",
+      "2 tablespoons olive oil, plus extra for greasing",
+      "2-3 cups mix-ins of choice (see instructions for ideas)",
+      "Optional toppings: Pickled red onions, Aioli"
+    ],
+    "instructions": [
+      "Preheat oven to 375°F (190°C).",
+      "Prepare your mix-ins: Common options include leftover roasted potatoes, caramelized onions, cubed ham, cooked pasta, scallions, diced chicken, roasted broccoli/cauliflower, sautéed mushrooms, or wilted greens. Ensure raw ingredients are cooked before adding.",
+      "In a large bowl, whisk together eggs, cream, Parmesan, and salt until the mixture is frothy.",
+      "Prepare a 10-inch cast iron skillet or oven-safe non-stick pan: Drizzle a small amount of olive oil into the pan and use a paper towel to wipe it over the bottom and sides. Add the remaining 2 tablespoons of olive oil and heat over medium heat.",
+      "Spread your chosen mix-ins evenly over the bottom of the hot pan.",
+      "Pour the frothy egg mixture over the mix-ins. Use a heat-safe spatula to gently move ingredients around so they are distributed evenly.",
+      "Transfer the skillet to the oven and bake for 15-20 minutes. The frittata is done when the center is just set and no longer looks runny.",
+      "Serve warm with pickled red onions and aioli."
+    ],
+    "tags": [
+      "breakfast",
+      "dinner",
+      "easy",
+      "leftovers",
+      "gluten-free",
+      "vegetarian"
+    ]
+  },
+  {
+    "title": "Aioli Variations (Berbere, Vadouvan, Sherry)",
+    "description": "Three variations of a foolproof homemade mayonnaise using the immersion blender method. Perfect for dipping fries, topping frittatas, or spreading on sandwiches.",
+    "photo": "",
+    "ingredients": [
+      "--- METHOD EQUIPMENT ---",
+      "Immersion blender",
+      "Jar (just wide enough to fit blender head)",
+      "--- BERBERE VARIATION ---",
+      "4 egg yolks",
+      "3 tbsp berbere spice",
+      "1 tbsp lemon juice",
+      "3 tbsp rice wine vinegar",
+      "3 tbsp water",
+      "4 cups neutral oil",
+      "Salt to taste",
+      "--- VADOUVAN VARIATION ---",
+      "4 egg yolks",
+      "3 tbsp vadouvan spice",
+      "1 tbsp lime juice",
+      "3 tbsp rice wine vinegar",
+      "3 tbsp water",
+      "4 cups neutral oil",
+      "Salt to taste",
+      "--- SHERRY GARLIC VARIATION ---",
+      "4 egg yolks",
+      "4 minced garlic cloves",
+      "1/4 cup sherry vinegar",
+      "1/4 cup water",
+      "4 cups neutral oil",
+      "Salt to taste"
+    ],
+    "instructions": [
+      "Select your variation and gather those specific ingredients.",
+      "Place all ingredients for that variation (yolks, acids, water, spices, and oil) into a jar that is just barely wider than the head of your immersion blender.",
+      "Place the immersion blender all the way at the bottom of the jar.",
+      "Turn the blender on high and hold it completely still at the bottom until the mixture turns white and thick at the base (emulsifies).",
+      "Slowly lift the blender up through the oil to incorporate the rest of the ingredients until thick and creamy."
+    ],
+    "tags": [
+      "sauce",
+      "condiment",
+      "dip",
+      "dairy-free",
+      "gluten-free",
+      "easy"
+    ]
+  },
+  {
+    "title": "Pickled Red Onions",
+    "description": "Tangy, bright pink onions that add a perfect crunch and acid to frittatas, tacos, or sandwiches. They keep for weeks in the fridge.",
+    "photo": "",
+    "ingredients": [
+      "2 red onions, julienned",
+      "1 cup red wine vinegar",
+      "1/2 cup sugar",
+      "2 teaspoons salt"
+    ],
+    "instructions": [
+      "Place the julienned onions in a heatproof container (like a mason jar).",
+      "Combine the vinegar, sugar, and salt in a small saucepan.",
+      "Bring the mixture to a simmer, stirring to dissolve the sugar and salt.",
+      "Pour the hot brine over the onions.",
+      "Weight the onions down so they stay submerged in the liquid.",
+      "Refrigerate. They will turn bright pink and are ready to eat once cooled."
+    ],
+    "tags": [
+      "condiment",
+      "topping",
+      "pickles",
+      "vegan",
+      "gluten-free",
+      "easy"
+    ]
+  },
+  {
+    "title": "Pagliaccio Salad & Dressing (Clone)",
+    "description": "A homemade version of the famous Pagliacci Pizza salad. Features a savory, creamy tarragon dressing over crisp romaine, salami, and chickpeas.",
+    "photo": "",
+    "ingredients": [
+      "--- SALAD BASE ---",
+      "Romaine lettuce, chopped",
+      "Diced salami",
+      "Diced fire-roasted red peppers",
+      "Garbanzo beans, drained and rinsed",
+      "Shredded Kasseri cheese (or Mozzarella)",
+      "--- DRESSING ---",
+      "1 minced garlic clove",
+      "2 tablespoons red wine vinegar",
+      "2 tablespoons lemon juice",
+      "1 egg",
+      "1 egg yolk",
+      "1 teaspoon kosher salt",
+      "1/2 teaspoon black pepper",
+      "1/4 teaspoon sugar",
+      "1 tablespoon Dijon mustard",
+      "1 teaspoon Worcestershire sauce",
+      "1 tablespoon chopped fresh tarragon",
+      "1 2/3 cups olive oil"
+    ],
+    "instructions": [
+      "--- MAKE THE DRESSING ---",
+      "Place all dressing ingredients (garlic, vinegar, lemon, eggs, seasonings, mustard, Worcestershire, tarragon, and olive oil) into a jar just wide enough to fit the head of your immersion blender.",
+      "Place the immersion blender at the very bottom of the jar.",
+      "Turn on high and hold still at the bottom until the mixture emulsifies (turns thick and creamy).",
+      "Slowly lift the blender to incorporate the rest of the oil.",
+      "--- ASSEMBLE SALAD ---",
+      "Combine romaine, salami, peppers, garbanzo beans, and cheese in a large bowl.",
+      "Toss with desired amount of dressing just before serving."
+    ],
+    "tags": [
+      "salad",
+      "dressing",
+      "copycat",
+      "dinner",
+      "lunch",
+      "gluten-free"
+    ]
+  },
+  {
+    "title": "Peas & Pesto Pasta Salad",
+    "description": "A creamy, satisfying pasta salad featuring pesto, artichoke hearts, and peas. Best served chilled.",
+    "photo": "",
+    "ingredients": [
+      "16-ounce box (1 pound) orecchiette pasta",
+      "1 cup pesto (frozen or homemade)",
+      "1/2 cup mayonnaise",
+      "1 teaspoon Kosher salt",
+      "1/2 teaspoon white pepper (or freshly ground black pepper)",
+      "13.75-ounce can artichoke hearts (or jarred equivalent), drained",
+      "1 cup frozen peas",
+      "1 cup finely grated Parmesan cheese"
+    ],
+    "instructions": [
+      "Bring a large pot of salted water to a boil.",
+      "While water heats, mix pesto, mayonnaise, salt, and pepper together in a large bowl and set aside.",
+      "Cook orecchiette according to package directions (cook slightly past al dente for a softer salad texture).",
+      "While pasta cooks, drain artichoke hearts and cut into small bite-size pieces.",
+      "When pasta is done, drain it, rinse briefly with cold water while tossing, and drain well.",
+      "Add pasta to the pesto mixture in the large bowl and mix to coat.",
+      "Reuse the pasta pot to bring an inch of water to a boil. Add the frozen peas and cook just until the water bubbles again and peas are bright green. Drain and rinse with cold water.",
+      "Add artichoke hearts, peas, and Parmesan cheese to the pasta mixture. Stir gently to incorporate.",
+      "Chill in the refrigerator for at least 20 minutes before serving. Stir gently and season with additional salt/pepper if needed before eating."
+    ],
+    "tags": [
+      "salad",
+      "pasta",
+      "lunch",
+      "side dish",
+      "pesto",
+      "vegetarian"
+    ]
+  },
+  {
+    "title": "Tuna and Bean Salad",
+    "description": "An easy, light meal packed with protein and Omega-3 fatty acids. While the authentic version uses olive-oil packed tuna, this version uses water-packed tuna for a lighter touch.",
+    "photo": "",
+    "ingredients": [
+      "1 small or 1/2 medium red onion, peeled and very thinly sliced",
+      "1 tablespoon plus 1 teaspoon red wine vinegar or sherry vinegar",
+      "1 (6 1/2-ounce) can water-packed tuna, drained",
+      "1 (15-ounce) can cannellini beans or borlotti beans, drained and rinsed",
+      "3 fresh sage leaves, slivered",
+      "2 tablespoons finely chopped flat-leaf parsley",
+      "Salt and freshly ground pepper",
+      "1 small or medium garlic clove, finely minced",
+      "1/2 teaspoon Dijon mustard",
+      "3 tablespoons extra virgin olive oil",
+      "1 tablespoon plain low-fat or nonfat yogurt (or omit and use 4 tablespoons olive oil total)"
+    ],
+    "instructions": [
+      "Place the onion in a bowl and add 1 teaspoon of the vinegar and cold water to cover. Let sit for 5 minutes. Drain and rinse with cold water, then dry on paper towels.",
+      "In a medium bowl or salad bowl, combine the tuna, beans, onions, sage, and parsley.",
+      "In a small bowl or measuring cup, mix together the remaining vinegar, salt to taste, freshly ground pepper, garlic, and Dijon mustard.",
+      "Whisk in the olive oil and the yogurt.",
+      "Toss the dressing with the tuna and beans and serve."
+    ],
+    "tags": [
+      "salad",
+      "lunch",
+      "high-protein",
+      "easy",
+      "gluten-free",
+      "quick"
+    ]
+  },
+  {
+    "title": "French Lentil Salad with Feta and Mint",
+    "description": "A dish that strikes a balance of rustic and elegant. Tiny French lentils are tossed with a tangy shallot vinaigrette, crunchy fennel, and creamy feta. Enormously satisfying and nourishing.",
+    "photo": "",
+    "ingredients": [
+      "1 1/2 cups dried French lentils",
+      "3 fat cloves garlic, peeled",
+      "1 large bay leaf",
+      "2 1/2 teaspoons kosher salt, divided",
+      "1 1/2 tablespoons coarse Dijon mustard",
+      "3 tablespoons white or red wine vinegar",
+      "2 tablespoons extra-virgin olive oil",
+      "Freshly ground black pepper",
+      "1/2 teaspoon sumac",
+      "1/4 cup minced shallot (1 medium)",
+      "1 small or 1/2 large bulb fennel, diced",
+      "1/4 cup finely chopped fresh mint",
+      "3 ounces Feta or fresh goat cheese (chevre), crumbled",
+      "Roughly chopped Castelvetrano olives"
+    ],
+    "instructions": [
+      "Rinse the lentils with water in a colander and remove any debris.",
+      "Put lentils in a medium pot with the garlic and bay leaf and cover by 3 inches with water. Bring to a boil.",
+      "Once boiling, drop heat to a simmer. Simmer for 10 minutes.",
+      "Add 2 teaspoons salt, and continue simmering until the lentils are just tender but not mushy (15 to 20 minutes total).",
+      "While lentils cook, whisk together mustard, remaining 1/2 teaspoon salt, vinegar, oil, black pepper, and sumac in a medium bowl. Add the shallot and whisk again.",
+      "Once lentils are cooked, drain well and add to the bowl with the dressing. Mix well.",
+      "Add the diced fennel, mint, crumbled feta, and Castelvetrano olives. Mix gently.",
+      "Taste and adjust salt/pepper if needed. Serve warm or cold with Marinated Cucumbers."
+    ],
+    "tags": [
+      "salad",
+      "vegetarian",
+      "lunch",
+      "side dish",
+      "lentils",
+      "healthy"
+    ]
+  },
+  {
+    "title": "Marinated Cucumbers",
+    "description": "Crisp English cucumbers marinated in a savory, herb-filled vinaigrette. They get better after sitting for an hour or two, making them a perfect make-ahead side dish.",
+    "photo": "",
+    "ingredients": [
+      "1 English cucumber, sliced into thin rounds",
+      "Kosher salt",
+      "1 tablespoon red wine vinegar",
+      "3 tablespoons olive oil",
+      "1 teaspoon Dijon mustard",
+      "1/2 teaspoon garlic powder",
+      "1/2 teaspoon onion powder",
+      "1 teaspoon dried oregano",
+      "Freshly ground black pepper"
+    ],
+    "instructions": [
+      "Slice the cucumber into thin rounds.",
+      "Salt the slices liberally with kosher salt and place them in a bowl.",
+      "In a separate small bowl or jar, whisk together the red wine vinegar, olive oil, Dijon mustard, garlic powder, onion powder, oregano, and black pepper until emulsified.",
+      "Pour the dressing over the salted cucumbers and toss to coat.",
+      "Let sit for 1 to 2 hours before serving to allow flavors to meld."
+    ],
+    "tags": [
+      "side dish",
+      "salad",
+      "vegetable",
+      "vegan",
+      "gluten-free",
+      "easy",
+      "make-ahead"
+    ]
+  },
+  {
+    "title": "Sheet Pan Chicken Thighs",
+    "description": "Effortless roasted chicken marinated with lemon, onions, and thyme. This pairs perfectly over the French Lentil Salad.",
+    "photo": "",
+    "ingredients": [
+      "Skinless, boneless chicken thighs (about 1.5 - 2 lbs)",
+      "1 yellow onion, sliced very thin",
+      "1 lemon, halved and cut into thin slices",
+      "1 bunch fresh thyme (no need to stem)",
+      "Salt, to taste",
+      "Black pepper, to taste (optional)",
+      "Olive oil (a decent drizzle, approx. 1/4 cup)"
+    ],
+    "instructions": [
+      "In a large bowl or bag, combine the chicken thighs, sliced onion, lemon slices, and thyme sprigs.",
+      "Season liberally with salt and black pepper (if using).",
+      "Pour a decent amount of olive oil over everything and toss well to coat.",
+      "Let marinate for a couple of hours or overnight in the refrigerator.",
+      "Preheat oven to 400°F (200°C).",
+      "Spread the chicken and marinade ingredients evenly onto a sheet pan.",
+      "Roast for 10-15 minutes, or until the chicken is fully cooked through (time will vary based on size)."
+    ],
+    "tags": [
+      "dinner",
+      "chicken",
+      "sheet pan",
+      "easy",
+      "gluten-free"
+    ]
+  },
+  {
+    "title": "Simple Marinara Sauce",
+    "description": "A classic, vibrant tomato sauce made with San Marzano tomatoes and plenty of garlic. Perfect for pasta or braising chicken.",
+    "photo": "",
+    "ingredients": [
+      "5 cloves garlic, slivered",
+      "1 can San Marzano tomatoes",
+      "Olive oil (enough to fill pan 1/4 inch deep)",
+      "Pinch of chile flakes",
+      "Kosher salt, to taste"
+    ],
+    "instructions": [
+      "Open your can of tomatoes before starting (timing is critical!).",
+      "Pour olive oil into a saucepan to a depth of about 1/4 inch. Heat over medium until shimmering and moving fast when swirled.",
+      "Add the slivered garlic and stir constantly with a wooden spoon.",
+      "As soon as the garlic starts sticking to itself (before it browns!), carefully dump in the tomatoes. You have about 10 seconds to do this once it gets sticky.",
+      "Bump heat to medium-high and switch to a potato masher.",
+      "Add the chile flakes and salt.",
+      "Use the masher to stir and smash the tomatoes until they are mostly broken up and pulpy.",
+      "Bring to a simmer, then drop heat to low and cook for about 30 minutes.",
+      "Pull out a spoonful, let it cool to room temperature, taste, and adjust salt as needed."
+    ],
+    "tags": [
+      "sauce",
+      "italian",
+      "vegetarian",
+      "vegan",
+      "gluten-free",
+      "easy",
+      "pasta"
+    ]
+  },
+  {
+    "title": "Bulgogi (Meal Prep)",
+    "description": "Classic Korean marinated beef, prep-cooked and packed with rice and greens for the week.",
+    "photo": "",
+    "ingredients": [
+      "1 pound well-marbled boneless sirloin, tenderloin or skirt steak",
+      "4 large garlic cloves",
+      "1 cup peeled, chopped ripe Asian or Bosc pear",
+      "3/4 cup finely chopped onion",
+      "1 teaspoon finely chopped ginger",
+      "1 scallion, chopped",
+      "2 tablespoons soy sauce",
+      "1 tablespoon roasted sesame oil",
+      "1 tablespoon light brown sugar or honey",
+      "1/2 teaspoon black pepper",
+      "1/2 teaspoon sesame seeds, toasted",
+      "--- FOR MEAL PREP ---",
+      "White rice (cooked)",
+      "Sauteed greens (bok choy, spinach, or kale with garlic)"
+    ],
+    "instructions": [
+      "Wrap beef in plastic wrap and freeze for 1 to 2 hours to firm up (makes slicing easier).",
+      "Cut beef across the grain into thin slices (less than 1/8 inch thick).",
+      "In a food processor, combine garlic, pear, onion, and ginger. Process until very smooth and creamy (about 1 minute).",
+      "In a bowl or sealable bag, combine steak, pear marinade, scallion, soy sauce, sesame oil, brown sugar, and pepper. Mix well.",
+      "Cover/seal and refrigerate overnight (or at least 30 minutes).",
+      "To Cook: Heat a cast-iron skillet over high heat. Add meat and its juices. Cook, stirring constantly, until liquid evaporates and meat browns.",
+      "Assembly: Divide cooked rice and sauteed greens into meal prep containers. Top with the beef and sprinkle with sesame seeds. Store in fridge."
+    ],
+    "tags": [
+      "meal prep",
+      "lunch",
+      "dinner",
+      "beef",
+      "korean",
+      "high-protein"
+    ]
+  },
+  {
+    "title": "Sautéed Kale with Garlic & Butter",
+    "description": "Tender kale braised in chicken broth and finished with emulsified butter. The perfect savory green side for the Bulgogi meal prep.",
+    "photo": "",
+    "ingredients": [
+      "2 tablespoons butter, divided",
+      "1 clove garlic, slivered",
+      "1 bunch kale, stemmed and roughly chopped",
+      "1/2 cup chicken broth (or Better than Bouillon mixed with hot water)",
+      "Salt, to taste"
+    ],
+    "instructions": [
+      "Melt 1 tablespoon of butter in a pan over medium heat.",
+      "Add the slivered garlic and cook until it just starts to soften.",
+      "Add the chopped kale. Toss with tongs until fully coated in butter and starting to soften.",
+      "Pour in the chicken broth. Simmer until the kale is very wilted and the liquid has reduced by more than half.",
+      "Add the remaining 1 tablespoon of butter and stir rapidly to emulsify it with the reduced liquid.",
+      "Taste for salt (you may not need any if using bouillon)."
+    ],
+    "tags": [
+      "side dish",
+      "vegetable",
+      "gluten-free",
+      "easy",
+      "meal prep"
+    ]
+  },
+  {
+    "title": "Spicy Peanut Noodle Salad",
+    "description": "A refreshing, spicy, and crunchy cold noodle salad. Packed with fresh veggies and tossed in a savory peanut-lime dressing.",
+    "photo": "",
+    "ingredients": [
+      "--- NOODLES ---",
+      "8 ounces fresh Chinese noodles (or 1/4 lb dried linguini/spaghetti)",
+      "--- DRESSING ---",
+      "1/2 cup chunky peanut butter",
+      "3 tablespoons soy sauce",
+      "3 tablespoons fresh ground chili sauce (Sambal Oelek or Sriracha)",
+      "2 tablespoons lime juice (or rice wine vinegar)",
+      "1 tablespoon toasted sesame oil",
+      "1 clove garlic, grated",
+      "1 tablespoon honey",
+      "3 tablespoons warm water",
+      "--- MIX-INS ---",
+      "2 large bell peppers (red/orange/yellow), thin strips",
+      "1 large cucumber, seeded and sliced/julienned",
+      "1 cup mung bean sprouts",
+      "1 cup fresh basil, mint, or cilantro leaves",
+      "8 scallions, thinly sliced on a bias",
+      "2 jalapeño peppers, seeded and sliced thin",
+      "1-2 red Thai bird chiles, minced (optional)",
+      "1/2 cup roasted peanuts, crushed (topping)"
+    ],
+    "instructions": [
+      "Cook noodles according to package directions. Drain and transfer to a large bowl of ice water. Agitate until thoroughly chilled. Drain well.",
+      "In a large bowl, whisk together peanut butter, soy sauce, chili sauce, lime juice, sesame oil, garlic, honey, and warm water until homogeneous.",
+      "Add the drained noodles to the bowl with the dressing.",
+      "Add bell peppers, cucumber, bean sprouts, herbs, scallions, and peppers. Toss to combine.",
+      "Serve immediately, topped with crushed roasted peanuts."
+    ],
+    "tags": [
+      "lunch",
+      "dinner",
+      "salad",
+      "spicy",
+      "vegetarian",
+      "cold noodles"
+    ]
+  },
+  {
+    "title": "Red Chile Pozole",
+    "description": "A rich, comforting Mexican hominy soup with shredded chicken. Adapted from David Lebovitz/Rancho Gordo. This version is mild, but can be spiced up with the optional Árbol Chile Salsa.",
+    "photo": "",
+    "ingredients": [
+      "--- RED CHILE PASTE ---",
+      "2 cups water",
+      "2 ancho chiles, wiped clean, stemmed and seeded",
+      "3 guajillo chiles, wiped clean, stemmed and seeded",
+      "1/2 medium onion, peeled and diced",
+      "6 cloves garlic, peeled and sliced",
+      "--- SOUP ---",
+      "4 chicken thighs",
+      "4 chicken legs",
+      "2 chicken feet, chopped, and 1 chicken back (optional, for body)",
+      "1/2 onion, peeled and diced",
+      "3 cloves garlic, peeled and sliced",
+      "2 bay leaves",
+      "3 black peppercorns, cracked",
+      "1 tablespoon kosher salt (or 2 tsp Morton)",
+      "8-10 cups water",
+      "5-6 cups prepared (cooked) hominy, drained",
+      "--- GARNISHES ---",
+      "Shredded cabbage",
+      "Diced avocado",
+      "Sliced radishes",
+      "Lime wedges",
+      "Tortilla chips",
+      "Dried Mexican oregano (optional)"
+    ],
+    "instructions": [
+      "--- MAKE CHILE PASTE ---",
+      "Heat 2 cups water in a saucepan. Remove from heat. Toast dried chiles in a hot skillet for 1-2 mins until fragrant. Soak toasted chiles in the hot water for 15 mins.",
+      "Puree chiles, onion, and garlic in a blender with just enough soaking liquid (approx 1/2 cup) to blend smooth. Strain through a mesh sieve. Set aside.",
+      "--- MAKE SOUP ---",
+      "Place chicken parts, onion, garlic, bay leaves, peppercorns, and salt in a large pot. Add 8-10 cups water to just cover. Boil, reduce to simmer, and cook 1 hour.",
+      "Remove chicken to a plate. Strain stock and chill (preferably overnight) to skim fat. Shred meat from chicken, discarding skin/bones.",
+      "In a large pot, whisk chile paste into 6 cups of the skimmed stock. Add shredded chicken and hominy. Simmer until hot. Adjust thickness with more stock if needed.",
+      "Serve with cabbage, avocado, radishes, lime, and chips."
+    ],
+    "tags": [
+      "soup",
+      "dinner",
+      "mexican",
+      "chicken",
+      "gluten-free",
+      "spicy"
+    ]
+  },
+  {
+    "title": "The Best Egg Salad Sandwich",
+    "description": "A game-changing egg salad using the steam-then-shock method for perfect peeling. This recipe uses a hands-on mixing technique for the best texture. Try swapping the mayo for any of your homemade Aioli variations!",
+    "photo": "",
+    "ingredients": [
+      "6 large eggs",
+      "1/4 cup mayonnaise (or substitute with Berbere, Vadouvan, or Sherry Aioli)",
+      "1/2 teaspoon lemon zest",
+      "1 1/2 teaspoons fresh lemon juice",
+      "1/3 cup finely diced celery (about 1 small stalk)",
+      "1/4 cup finely sliced scallions, white and pale green parts only",
+      "1 tablespoon minced fresh parsley leaves",
+      "Kosher salt and freshly ground black pepper",
+      "Bread, lettuce, and thinly sliced radishes, for serving (optional)",
+      "Ice cubes (for cooling eggs)"
+    ],
+    "instructions": [
+      "--- STEAM THE EGGS ---",
+      "Prepare an ice bath: Fill a large bowl with water and a tray of ice cubes.",
+      "Add 1 inch of water to a large pot. Place a steamer insert inside, cover, and bring to a boil over high heat.",
+      "Add eggs to the steamer basket, cover, and cook for exactly 9 minutes (this yields the ideal texture for egg salad).",
+      "Immediately transfer eggs to the ice bath and allow to cool for at least 15 minutes.",
+      "Peel the eggs: Gently tap them all over to thoroughly crack the shell, then remove the shell under a thin stream of running water.",
+      "--- MAKE THE SALAD ---",
+      "In a medium bowl, combine the peeled eggs, mayonnaise (or aioli), lemon zest, lemon juice, celery, scallions, and parsley.",
+      "Using your hands, squeeze the eggs through your fingers to mix until reduced to your desired consistency (alternatively, smash with a firm whisk).",
+      "Season generously with salt and pepper.",
+      "Serve as sandwiches with lettuce, sliced radishes, and bread."
+    ],
+    "tags": [
+      "lunch",
+      "sandwich",
+      "vegetarian",
+      "high-protein",
+      "easy",
+      "meal prep"
+    ]
+  },
+  {
+    "title": "Roasted Yams and Kale",
+    "description": "Sweet roasted yams and crispy kale tossed with caramelized onions and a savory roasted garlic dressing.",
+    "photo": "",
+    "ingredients": [
+      "2 pounds unpeeled Jewel or Garnet yams, cut into wedges (1-inch long by 1/2-inch wide)",
+      "1/4 cup cooking oil, divided",
+      "Salt and black pepper, to taste",
+      "1/4 cup whole cloves garlic, peeled",
+      "1 yellow onion, sliced",
+      "1 bunch green kale, tough stems removed and leaves cut into 1/2-inch strips",
+      "2 tablespoons red wine vinegar",
+      "1/2 teaspoon dried thyme"
+    ],
+    "instructions": [
+      "Preheat oven to 400° F.",
+      "Toss yams with 1 tablespoon oil, salt, and pepper. Spread onto a baking sheet.",
+      "Create a foil packet for the garlic: Place garlic cloves on foil, drizzle with 1 1/2 teaspoons oil, sprinkle with salt/pepper, and seal tightly.",
+      "Place both the yams and the garlic packet in the oven. Roast yams until golden/tender (35-45 mins) and garlic until soft (40-50 mins). Let cool.",
+      "While roasting, heat 1 tablespoon oil in a sauté pan over medium-low heat. Add sliced onions and cook until caramelized (30-40 mins). Let cool.",
+      "Increase oven temperature to 450° F.",
+      "Lightly coat kale with remaining oil, salt, and pepper. Roast on a baking sheet until soft but browned at edges (about 3 minutes). Let cool.",
+      "Make the dressing: Blend the roasted garlic cloves, vinegar, and thyme until smooth.",
+      "Combine dressing, yams, kale, and onions in a large bowl and toss to coat."
+    ],
+    "tags": [
+      "side dish",
+      "vegetarian",
+      "vegan",
+      "gluten-free",
+      "simple",
+      "healthy"
+    ]
+  },
+  {
+    "title": "Cincinnati Chili",
+    "description": "A unique regional chili served over spaghetti. This authentic version boils the beef to create a fine texture and features a complex spice blend including cinnamon, allspice, and cloves.",
+    "photo": "",
+    "ingredients": [
+      "--- THE CHILI ---",
+      "2 pounds ground beef (80% lean)",
+      "2 quarts cold water, divided",
+      "2 medium sweet onions, finely minced",
+      "6 cloves garlic, finely minced",
+      "3/4 cup tomato paste",
+      "2 tablespoons red wine vinegar",
+      "1 tablespoon Worcestershire sauce",
+      "3 bay leaves",
+      "1 1/2 tablespoons Kosher salt",
+      "1/3 cup active dry yeast",
+      "2 tablespoons chili powder",
+      "2 tablespoons sweet paprika",
+      "1 teaspoon ground allspice",
+      "1/2 teaspoon cayenne pepper",
+      "1 teaspoon ground cinnamon",
+      "1 teaspoon ground cumin",
+      "1 teaspoon oregano",
+      "1 teaspoon ground white pepper",
+      "1/2 teaspoon ground cloves",
+      "1/2 teaspoon ground ginger",
+      "--- TO SERVE ---",
+      "1 1/2 pounds dried spaghetti",
+      "1/4 cup extra-virgin olive oil",
+      "1/4 cup tomato paste (for pasta)",
+      "1 medium sweet onion, grated (optional)",
+      "1 can kidney beans, warmed and drained (optional)",
+      "1 1/2 pounds medium cheddar, finely shredded",
+      "Hot sauce (Frank's or Crystal)",
+      "Oyster crackers"
+    ],
+    "instructions": [
+      "In a large Dutch oven, combine 1 quart cold water with the beef. Whisk vigorously until beef breaks up into a thick slurry (about 2 minutes).",
+      "Add the remaining 1 quart water along with onions, garlic, tomato paste, vinegar, Worcestershire, bay leaves, salt, yeast, and all spices. Mix well.",
+      "Bring to a boil, then reduce heat to a gentle simmer.",
+      "Cook for about 3 hours, stirring occasionally, until thickened but still saucy (not thick enough to stand a spoon in).",
+      "Cook spaghetti in salted boiling water until soft (2-3 minutes past al dente).",
+      "Whisk olive oil and the 1/4 cup tomato paste in a large bowl. Toss the cooked spaghetti in this mixture.",
+      "Serve on oval plates: Spaghetti first, then ladles of chili, then optional beans/onions, and finally a mountain of shredded cheddar.",
+      "Serve with oyster crackers and hot sauce."
+    ],
+    "tags": [
+      "dinner",
+      "beef",
+      "pasta",
+      "regional",
+      "comfort food",
+      "make-ahead"
+    ]
+  },
+  {
+    "title": "Lebanese Kofta",
+    "description": "Spiced ground lamb skewers grilled to perfection. Good with Tzatziki, but GREAT with Raita.",
+    "photo": "",
+    "ingredients": [
+      "1 1/2 pounds finely ground lamb",
+      "1 bunch of parsley, washed and coarsely chopped",
+      "1 large red onion, coarsely chopped",
+      "1/4 teaspoon cinnamon",
+      "1/4 teaspoon cloves",
+      "1/4 teaspoon nutmeg",
+      "Salt and freshly ground pepper",
+      "Bamboo skewers (soaked in water for 30 mins)"
+    ],
+    "instructions": [
+      "Soak bamboo skewers in water for at least 30 minutes prior to use.",
+      "Pulse onion and parsley in a food processor until finely chopped.",
+      "Transfer onion mixture to a large bowl and add the ground lamb, cinnamon, cloves, nutmeg, salt, and pepper. Mix with your hands until thoroughly combined.",
+      "Form lamb mixture into 1 1/2-inch meatballs.",
+      "Thread one meatball on a skewer, then form the meat into a log shape around the skewer. Repeat until all lamb is used.",
+      "Prepare grill for high heat.",
+      "Grill skewers over high heat until browned on all sides and cooked through, about 2 minutes per side.",
+      "Remove from grill and serve."
+    ],
+    "tags": [
+      "dinner",
+      "lamb",
+      "grill",
+      "middle eastern",
+      "high-protein",
+      "dairy-free"
+    ]
+  },
+  {
+    "title": "Raita",
+    "description": "A cooling cucumber and yogurt side dish seasoned with garam masala and cayenne. Perfect for balancing out spicy meals.",
+    "photo": "",
+    "ingredients": [
+      "1 large cucumber (about 1/2 pound), peeled if waxy, seeds removed if necessary (Japanese, Persian, or hothouse preferred)",
+      "Salt",
+      "1 cup plain Greek style yogurt",
+      "1/8 teaspoon cayenne (more to taste)",
+      "2 tablespoons chopped cilantro",
+      "1/2 teaspoon garam masala (more to taste)",
+      "1 small serrano or Thai chile, minced (optional)"
+    ],
+    "instructions": [
+      "Cut the cucumber into very small dice or grate on the large holes of a grater.",
+      "Sprinkle with a generous amount of salt, toss, and let sit in a colander in the sink for 15 minutes.",
+      "Rinse briefly and squeeze dry in a kitchen towel. Transfer to a bowl.",
+      "Beat the yogurt with a fork or a whisk and add the cayenne and garam masala.",
+      "Toss with the cucumbers. Add the cilantro and chile and toss again.",
+      "Taste and adjust salt. Chill until ready to serve.",
+      "Note: This keeps for a few days in the refrigerator but may become watery; stir well before serving."
+    ],
+    "tags": [
+      "side dish",
+      "indian",
+      "vegetarian",
+      "gluten-free",
+      "cooling",
+      "sauce"
+    ]
+  },
+  {
+    "title": "Carne Adovada",
+    "description": "A rich and robust New Mexican pork stew featuring dried chilies and spices. The two-stage cooking process ensures deep flavor and tender meat.",
+    "photo": "",
+    "ingredients": [
+      "3 ounces New Mexico chilies, stemmed, seeded and torn",
+      "3 ounces guajillo chilies, stemmed, seeded and torn",
+      "4 cups boiling water",
+      "1 cup water, divided",
+      "5 pounds boneless pork butt, trimmed of excess fat and cut into 1 1/2-inch cubes",
+      "Kosher salt and ground black pepper",
+      "2 tablespoons lard or grapeseed oil",
+      "2 medium white onions, chopped",
+      "6 medium garlic cloves, minced",
+      "4 teaspoons cumin seed",
+      "4 teaspoons ground coriander",
+      "1 teaspoon dried oregano (preferably Mexican)",
+      "3/4 teaspoon cayenne pepper",
+      "1 tablespoon molasses",
+      "--- TO SERVE ---",
+      "Homestyle flour tortillas",
+      "Shredded cheddar cheese",
+      "Raw white or red onions, diced fine"
+    ],
+    "instructions": [
+      "Place the chilies in a large bowl, pour in the 4 cups boiling water and stir. Let sit until softened, about 30 minutes.",
+      "Transfer half of the mixture to a blender and blend until smooth. Add the remaining chilies and liquid and blend until smooth.",
+      "Measure 1/2 cup of the chili puree into a small bowl, cover and refrigerate until needed (this adds fresh flavor at the end).",
+      "Pour the remaining puree into a bowl. Pour 1/2 cup of fresh water into the empty blender, shake to release the residue.",
+      "Place pork in a large bowl. Add 1 teaspoon salt and the chili-water rinse from the blender. Stir to coat, cover, and refrigerate for 1 hour.",
+      "Preheat oven to 325°F with rack in lower-middle position.",
+      "In a large Dutch oven over medium heat, melt the lard. Add onions and cook until softened (8-10 mins).",
+      "Stir in garlic, cumin, coriander, oregano, and cayenne; cook until fragrant (30 seconds).",
+      "Stir in the remaining 1/2 cup water and the main batch of chili puree.",
+      "Add the pork and any liquid from the bowl. Stir, cover, and bake for 2 hours.",
+      "Uncover, stir, and return to oven uncovered. Cook until pork is tender, about 1 1/2 to 2 hours longer.",
+      "Remove from oven. Simmer on stovetop over medium heat to thicken the sauce (8-10 mins).",
+      "Stir in the reserved 1/2 cup chili puree and the molasses. Season with salt and pepper.",
+      "Serve with warm flour tortillas, shredded cheddar, and finely diced raw onion."
+    ],
+    "tags": [
+      "dinner",
+      "stew",
+      "pork",
+      "mexican",
+      "spicy",
+      "slow-cook"
+    ]
+  },
+  {
+    "title": "Cheeseburger Meatloaf",
+    "description": "A diner-style twist on classic meatloaf. We've swapped the vegetable mix for bacon and dill pickles, and spiked the glaze with yellow mustard for that authentic burger taste.",
+    "photo": "",
+    "ingredients": [
+      "--- LIQUID MIX ---",
+      "1/2 cup low-sodium chicken stock",
+      "1/4 cup buttermilk",
+      "1/2 ounce (2 packets) unflavored gelatin",
+      "--- BREADING ---",
+      "2 slices high-quality white sandwich bread, crusts removed and torn",
+      "--- AROMATICS & BACON ---",
+      "2 tablespoons unsalted butter",
+      "3-4 strips bacon, chopped (User addition)",
+      "1 small onion, roughly chopped",
+      "2 medium cloves garlic, chopped",
+      "--- MEAT & MIX-INS ---",
+      "12 ounces freshly ground pork",
+      "1 1/4 pounds freshly ground beef",
+      "2 large eggs",
+      "4 ounces cheddar cheese, finely grated",
+      "3/4 cup dill pickle relish (User addition)",
+      "1/4 cup finely minced fresh parsley",
+      "1 teaspoon paprika",
+      "Kosher salt and freshly ground black pepper",
+      "--- BURGER GLAZE ---",
+      "3/4 cup ketchup",
+      "1/4 cup yellow mustard (User addition)",
+      "1/4 cup packed light brown sugar",
+      "1/2 cup cider vinegar",
+      "1/2 teaspoon freshly ground black pepper"
+    ],
+    "instructions": [
+      "Combine chicken stock and buttermilk in a cup and sprinkle gelatin over the top. Set aside.",
+      "Place the bread in a food processor and pulse until finely chopped. Transfer to a large bowl.",
+      "Place onion and garlic in the processor and pulse until finely chopped.",
+      "Heat butter in a 10-inch nonstick skillet over medium-high heat. Add the chopped onion, garlic, and bacon. Cook, stirring, until softened and bacon is rendered (about 5 minutes).",
+      "Stir in the buttermilk/stock mixture, bring to a simmer, and cook until reduced by half (about 10 minutes).",
+      "Transfer the skillet mixture to the bowl with the bread crumbs. Stir to combine and let cool.",
+      "Add the ground beef, pork, eggs, cheese, parsley, paprika, 1 tablespoon kosher salt, 1 teaspoon pepper, and the dill pickle relish to the bowl. Mix gently with hands until homogeneous.",
+      "Transfer mixture to a 9-by-5-inch loaf pan, pressing down to remove air bubbles. Cover tightly with heavy-duty foil. Refrigerate while oven preheats.",
+      "Adjust oven rack to lower-middle position and preheat to 350°F.",
+      "Invert the loaf pan onto a rimmed baking sheet (do not remove the pan yet). Loosen the foil edges but leave the pan on top of the meat. Bake for 30 minutes.",
+      "Use a spatula to carefully lift the loaf pan off the meatloaf, leaving the meatloaf sitting on the foil on the baking sheet. Return to oven and bake until center registers 140°F (about 40 mins longer).",
+      "Remove from oven and increase temperature to 500°F.",
+      "Make the Glaze: Simmer ketchup, mustard, brown sugar, vinegar, and pepper in a saucepan until melted and homogeneous (2 minutes).",
+      "Brush glaze on meatloaf. Bake 3 minutes. Glaze again, bake 3 minutes. Glaze a final time and bake until bubbly and burnished.",
+      "Rest for 15 minutes before slicing."
+    ],
+    "tags": [
+      "dinner",
+      "meatloaf",
+      "beef",
+      "pork",
+      "comfort food",
+      "american"
+    ]
+  },
+  {
+    "title": "Sticky Ginger Soy Glazed Chicken",
+    "description": "An easy weeknight favorite where the marinade doubles as a sticky, savory glaze. Served with white rice and creamy slaw.",
+    "photo": "",
+    "ingredients": [
+      "--- MARINADE ---",
+      "1/4 cup brown sugar",
+      "3 Tbsp soy sauce",
+      "2 garlic cloves, minced",
+      "1 Tbsp fresh ginger, grated",
+      "Black pepper (freshly cracked)",
+      "1 Tbsp cooking oil",
+      "--- CHICKEN ---",
+      "8 boneless, skinless chicken thighs (about 1.75 lbs)",
+      "1/2 Tbsp cooking oil (for the pan)",
+      "--- GARNISH & SERVING ---",
+      "2 green onions, sliced",
+      "1 tsp sesame seeds",
+      "White rice",
+      "Teriyaki restaurant coleslaw"
+    ],
+    "instructions": [
+      "Mince the garlic and grate the ginger.",
+      "In a small bowl, stir together the brown sugar, soy sauce, garlic, ginger, pepper, and 1 Tbsp cooking oil to make the marinade.",
+      "Place chicken thighs in a shallow dish or zip-lock bag. Pour marinade over chicken and turn to coat.",
+      "Marinate for at least 30 minutes or up to a day in the refrigerator.",
+      "When ready to cook, heat a large skillet over medium heat. Add 1/2 Tbsp oil.",
+      "Add half the chicken pieces and cook until well browned and cooked through. Remove to a plate. Repeat with remaining chicken.",
+      "Once all chicken is removed, pour the leftover marinade from the bag into the hot skillet. Bring to a boil.",
+      "Whisk to dissolve browned bits and boil until reduced to a thick glaze.",
+      "Turn off heat. Add cooked chicken back to skillet and dredge in the glaze.",
+      "Garnish with green onions and sesame seeds. Serve with rice and coleslaw."
+    ],
+    "tags": [
+      "dinner",
+      "chicken",
+      "asian-inspired",
+      "dairy-free",
+      "budget-friendly",
+      "easy"
+    ]
+  },
+  {
+    "title": "Seattle Teriyaki Restaurant Coleslaw",
+    "description": "The classic, creamy, nutty, and slightly sweet slaw found at Seattle-style teriyaki joints. A complex dressing coats thinly shredded cabbage for the perfect crunch.",
+    "photo": "",
+    "ingredients": [
+      "1 cup mayonnaise",
+      "2 tablespoons rice vinegar",
+      "2 tablespoons granulated sugar",
+      "2 teaspoons soy sauce",
+      "1 teaspoon sesame oil",
+      "1 teaspoon water",
+      "1/4 teaspoon garlic powder",
+      "4 to 5 cups thinly sliced cabbage (about 1/2 head)",
+      "Sesame seeds (for garnish)"
+    ],
+    "instructions": [
+      "In a bowl, combine mayonnaise, rice vinegar, sugar, soy sauce, sesame oil, water, and garlic powder.",
+      "Whisk thoroughly to combine until the sugar is dissolved.",
+      "Toss the dressing with the sliced cabbage until evenly coated.",
+      "Garnish with sesame seeds before serving."
+    ],
+    "tags": [
+      "side dish",
+      "asian-inspired",
+      "vegetarian",
+      "no-cook",
+      "creamy",
+      "easy"
+    ]
+  }
+]
