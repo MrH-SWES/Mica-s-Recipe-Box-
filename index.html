@@ -421,7 +421,6 @@
 
     <div class="header">
         <h1>Mica's Recipe Box</h1>
-        <div class="cook-switch" onclick="toggleCookMode()">Cook Mode</div>
     </div>
 
     <!-- PLANNER TAB -->
@@ -440,15 +439,16 @@
     <div id="tab-recipes" class="tab-content">
         <div id="mealSelectionHint"></div>
         
-        <!-- Tag Filter Box -->
-        <div class="tag-filter-box">
-            <span class="tag-filter-label">Filter by tags:</span>
-            <div class="tag-grid" id="tagGrid"></div>
-            <button class="clear-filters" onclick="clearFilters()">Clear filters</button>
+        <!-- Tag Filter Toggle -->
+        <div class="controls-row" style="justify-content: space-between;">
+            <button class="pill-btn" onclick="toggleTagFilter()" id="tagFilterBtn">Filter by Tags</button>
+            <button class="pill-btn btn-sunflower" style="border:none;" onclick="surpriseMe()">Surprise Me</button>
         </div>
 
-        <div class="controls-row" style="justify-content: flex-end;">
-            <button class="pill-btn btn-sunflower" style="border:none;" onclick="surpriseMe()">Surprise Me</button>
+        <!-- Tag Filter Box (hidden by default) -->
+        <div class="tag-filter-box" id="tagFilterBox" style="display: none;">
+            <div class="tag-grid" id="tagGrid"></div>
+            <button class="clear-filters" onclick="clearFilters()">Clear filters</button>
         </div>
 
         <div class="card-stack-container" id="cardStack"></div>
@@ -541,7 +541,7 @@
         // CONFIG
         const BIN_ID = "6947951243b1c97be9fc48e7"; 
         const API_KEY = "$2a$10$qZdFvBQfv93zCuJiPDIln.ui9ln3pOufUtcpIivYnUQdJmakpBmWe";
-        const GEMINI_API_KEY = "AIzaSyBBg05zDMqhPkNiPUsRnZszHwWUk6q8R0M";
+        const GEMINI_API_KEY = "AIzaSyAOXSwXDzHMSzPxp9JS8DF5F4W36TDI7DY";
         
         let allRecipes = [];
         let filteredRecipes = [];
@@ -584,6 +584,18 @@
         }
 
         // --- TAG FILTER ---
+        function toggleTagFilter() {
+            const box = document.getElementById('tagFilterBox');
+            const btn = document.getElementById('tagFilterBtn');
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
+                btn.classList.add('active');
+            } else {
+                box.style.display = 'none';
+                btn.classList.remove('active');
+            }
+        }
+
         function populateTagGrid() {
             const grid = document.getElementById('tagGrid');
             const allTags = new Set();
@@ -616,6 +628,14 @@
                     chip.classList.remove('selected');
                 }
             });
+            
+            // Update button text to show filter count
+            const btn = document.getElementById('tagFilterBtn');
+            if (selectedTags.length > 0) {
+                btn.textContent = `Filter by Tags (${selectedTags.length})`;
+            } else {
+                btn.textContent = 'Filter by Tags';
+            }
         }
 
         function applyFilters() {
@@ -728,6 +748,7 @@
                 
                 <div class="card-actions">
                     ${planBtn}
+                    <button class="pill-btn" onclick="toggleCookMode()" style="flex:1;">Cook Mode</button>
                 </div>
             `;
             document.getElementById('expandedModal').classList.add('show');
