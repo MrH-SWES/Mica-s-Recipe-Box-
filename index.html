@@ -6,9 +6,10 @@
     <title>Mica's Recipe Box</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600;800&family=Patrick+Hand:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* --- THEME: MINT VINTAGE KITCHEN --- */
             --kitchen-mint: #78c0a8; 
             --kitchen-mint-dark: #5a9682;
             --kitchen-cream: #fbf9f2;
@@ -21,17 +22,14 @@
             --radius: 12px;
             --font-head: 'Special Elite', cursive;
             --font-body: 'Inter', sans-serif;
-            --card-cream: #FFFEF7;
-            --line-blue: #A8C8DC;
-            --line-red: #D98B8B;
         }
 
+        /* COOK MODE (High Contrast) */
         body.cook-mode-active {
             --kitchen-mint: #2a2a2a;
             --kitchen-mint-dark: #000;
             --kitchen-cream: #121212;
             --card-bg: #1e1e1e;
-            --card-cream: #2a2a2a;
             --text-dark: #eeeeee;
             --text-muted: #aaaaaa;
             --sunflower: #f4c430;
@@ -49,6 +47,7 @@
             transition: background 0.3s ease;
         }
 
+        /* --- HEADER --- */
         .header {
             background: var(--kitchen-mint);
             padding: 15px 20px;
@@ -70,22 +69,29 @@
         }
 
         .cook-switch {
+            position: relative;
+            width: 52px;
+            height: 30px;
             background: rgba(255,255,255,0.25);
-            border-radius: 20px;
+            border-radius: 30px;
             cursor: pointer;
             border: 2px solid rgba(255,255,255,0.8);
             transition: 0.3s;
-            padding: 6px 14px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: white;
         }
-        body.cook-mode-active .cook-switch { background: var(--sunflower); border-color: var(--sunflower); color: #333; }
+        body.cook-mode-active .cook-switch { background: var(--sunflower); border-color: var(--sunflower); }
+        .cook-switch::after {
+            content: '🍳'; position: absolute; top: 1px; left: 2px;
+            width: 24px; height: 24px; background: white; border-radius: 50%;
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        body.cook-mode-active .cook-switch::after { transform: translateX(22px); }
 
+        /* --- TABS --- */
         .tab-content { display: none; padding: 20px; max-width: 650px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- UI ELEMENTS --- */
         .controls-row { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         
         .pill-btn {
@@ -117,153 +123,42 @@
         }
         .ai-sort-btn:active { transform: translateY(4px); box-shadow: none; }
 
-        /* === RECIPE CARD STACK === */
-        .card-stack-container {
-            position: relative;
-            height: 420px;
-            margin: 20px auto;
-            max-width: 380px;
-            perspective: 1000px;
-        }
-
+        /* --- RECIPE CARD --- */
         .recipe-card {
-            position: absolute;
-            width: 100%;
-            height: 380px;
-            background: var(--card-cream);
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: all 0.35s ease-out;
-            cursor: pointer;
-            overflow: hidden;
-            left: 50%;
-            transform: translateX(-50%);
-            background-image: 
-                linear-gradient(var(--line-red) 0%, var(--line-red) 100%),
-                repeating-linear-gradient(to bottom, transparent, transparent 23px, var(--line-blue) 23px, var(--line-blue) 24px);
-            background-size: 2px 100%, 100% 24px;
-            background-position: 32px 0, 0 40px;
-            background-repeat: no-repeat, repeat;
+            background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+            overflow: hidden; margin-bottom: 25px; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .recipe-image-container { width: 100%; height: 220px; background: #eee; position: relative; }
+        .recipe-photo { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 25px; }
+        .recipe-title { font-family: var(--font-head); font-size: 1.8rem; color: var(--text-dark); margin-bottom: 8px; }
+        .recipe-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; font-style: italic; }
+        .section-header {
+            font-family: var(--font-head); color: var(--kitchen-mint-dark); font-size: 1.2rem;
+            border-bottom: 2px solid var(--kitchen-mint); padding-bottom: 5px; margin: 25px 0 15px 0;
+        }
+        .ingredient-row {
+            display: flex; align-items: flex-start; padding: 12px 0; border-bottom: 1px dashed #e0e0e0; cursor: pointer; font-size: 1rem;
+        }
+        body.cook-mode-active .ingredient-row { border-bottom-color: #333; }
+        .ingredient-row.checked { opacity: 0.4; text-decoration: line-through; }
+        .checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--sunflower); border-radius: 6px;
+            margin-right: 15px; flex-shrink: 0; background: var(--card-bg);
+        }
+        .ingredient-row.checked .checkbox { background: var(--sunflower); }
+        .instruction-step { margin-bottom: 20px; display: flex; gap: 15px; }
+        .step-num {
+            background: var(--kitchen-mint); color: white; width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; margin-top: 2px;
+        }
+        .timer-btn {
+            display: inline-block; background: var(--card-bg); border: 2px solid var(--sunflower);
+            color: var(--text-dark); font-weight: bold; font-size: 0.75rem; padding: 2px 8px;
+            border-radius: 12px; margin-left: 8px; cursor: pointer;
         }
 
-        .recipe-card[data-pos="0"] {
-            z-index: 20;
-            transform: translateX(-50%) rotate(0deg);
-        }
-        .recipe-card[data-pos="1"] {
-            z-index: 19;
-            transform: translateX(-46%) rotate(3deg);
-            opacity: 0.9;
-        }
-        .recipe-card[data-pos="2"] {
-            z-index: 18;
-            transform: translateX(-42%) rotate(6deg);
-            opacity: 0.75;
-        }
-        .recipe-card[data-pos="hidden"] {
-            z-index: 1;
-            transform: translateX(-50%) rotate(0deg) scale(0.9);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .recipe-card.flipping-out {
-            animation: flipOut 0.35s ease-in forwards;
-        }
-        @keyframes flipOut {
-            to { transform: translateX(-120%) rotate(-15deg); opacity: 0; }
-        }
-
-        .recipe-card.flipping-in {
-            animation: flipIn 0.35s ease-out forwards;
-        }
-        @keyframes flipIn {
-            from { transform: translateX(20%) rotate(15deg); opacity: 0; }
-            to { transform: translateX(-50%) rotate(0deg); opacity: 1; }
-        }
-
-        .card-content {
-            padding: 50px 20px 20px 45px;
-            height: 100%;
-            overflow-y: auto;
-        }
-
-        .card-title {
-            font-family: 'Patrick Hand', cursive;
-            font-size: 1.5rem;
-            color: #333;
-            line-height: 24px;
-            margin-bottom: 8px;
-        }
-        body.cook-mode-active .card-title { color: #eee; }
-
-        .card-meta {
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 12px;
-        }
-
-        .card-section-title {
-            font-family: var(--font-head);
-            font-size: 0.9rem;
-            color: var(--kitchen-mint-dark);
-            margin: 15px 0 8px 0;
-            border-bottom: 1px dashed var(--kitchen-mint);
-            padding-bottom: 3px;
-        }
-
-        .card-list {
-            font-size: 0.85rem;
-            line-height: 24px;
-            color: #555;
-        }
-        body.cook-mode-active .card-list { color: #ccc; }
-
-        .card-list li {
-            margin-left: 15px;
-            margin-bottom: 2px;
-        }
-
-        .card-nav {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .card-nav-btn {
-            background: var(--kitchen-mint);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
-
-        .card-counter {
-            text-align: center;
-            font-family: var(--font-head);
-            color: var(--text-muted);
-            margin-top: 10px;
-        }
-
-        .meal-hint {
-            background: var(--sunflower); color: #333; padding: 15px; text-align: center;
-            font-weight: bold; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px dashed #ccc;
-        }
-
-        /* === PLANNER === */
+        /* --- PLANNER STYLES --- */
         .meal-day-card {
             background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius);
             padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow);
@@ -280,27 +175,19 @@
             margin-bottom: 5px; font-size: 0.9rem;
         }
         .meal-chip button { background: none; border: none; color: #e76f51; font-weight: bold; cursor: pointer; font-size: 1.1rem;}
+        .meal-hint {
+            background: var(--sunflower); color: #333; padding: 15px; text-align: center;
+            font-weight: bold; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+        }
 
-        /* === SHOPPING === */
+        /* --- SHOPPING --- */
         .shopping-header {
             background: var(--kitchen-mint); color: white; padding: 10px 15px; border-radius: 8px;
             font-weight: 700; font-family: var(--font-head); margin-top: 20px; margin-bottom: 5px;
         }
         body.cook-mode-active .shopping-header { background: #333; color: var(--sunflower); }
 
-        .ingredient-row {
-            display: flex; align-items: flex-start; padding: 12px; border-bottom: 1px dashed #e0e0e0; cursor: pointer; font-size: 1rem;
-            background: var(--card-bg); border-radius: 8px; margin-bottom: 5px; border: 1px solid #eee;
-        }
-        body.cook-mode-active .ingredient-row { border-color: #333; }
-        .ingredient-row.checked { opacity: 0.4; text-decoration: line-through; }
-        .checkbox {
-            width: 22px; height: 22px; border: 2px solid var(--sunflower); border-radius: 6px;
-            margin-right: 15px; flex-shrink: 0; background: var(--card-bg);
-        }
-        .ingredient-row.checked .checkbox { background: var(--sunflower); }
-
-        /* === BOTTOM NAV === */
+        /* --- BOTTOM NAV --- */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%; background: var(--kitchen-mint);
             padding: 10px 0 20px 0; display: flex; justify-content: space-around;
@@ -321,7 +208,7 @@
         }
         body.cook-mode-active .nav-add-btn { border-color: #121212; }
 
-        /* === MODALS === */
+        /* --- MODALS --- */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.9); z-index: 1000; align-items: center; justify-content: center;
@@ -347,10 +234,9 @@
 
     <div class="header">
         <h1>Mica's Box</h1>
-        <div class="cook-switch" onclick="toggleCookMode()">Cook Mode</div>
+        <div class="cook-switch" onclick="toggleCookMode()"></div>
     </div>
 
-    <!-- PLANNER TAB -->
     <div id="tab-planner" class="tab-content active">
         <div class="controls-row" style="justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h2 style="font-family:var(--font-head); color:var(--kitchen-mint-dark); margin:0;">This Week</h2>
@@ -362,29 +248,25 @@
         </div>
     </div>
 
-    <!-- RECIPES TAB -->
     <div id="tab-recipes" class="tab-content">
         <div id="mealSelectionHint"></div>
-        <div class="controls-row" style="justify-content: space-between;">
-            <select id="tagFilter" onchange="setFilter(this.value)" style="flex:1; max-width: 200px; padding: 10px; border-radius: 25px; border: 2px solid var(--kitchen-mint); font-weight: 700; font-size: 0.9rem; color: var(--kitchen-mint-dark); background: var(--card-bg); cursor: pointer;">
-                <option value="All">All Recipes</option>
-            </select>
-            <button class="pill-btn btn-sunflower" style="border:none;" onclick="surpriseMe()">Surprise Me</button>
+        <div class="controls-row">
+            <button class="pill-btn active" id="btnAll" onclick="setFilter('All')">All</button>
+            <button class="pill-btn" onclick="setFilter('Favorites')">★ Faves</button>
+            <button class="pill-btn" onclick="setFilter('Dinner')">Dinner</button>
+            <button class="pill-btn" onclick="setFilter('Salad')">Salads</button>
+            <button class="pill-btn btn-sunflower" style="border:none;" onclick="surpriseMe()">🎲 Pick</button>
         </div>
 
-        <div class="card-stack-container" id="cardStack"></div>
-        <div class="card-counter" id="cardCounter"></div>
-        <div class="card-nav">
-            <button class="card-nav-btn" onclick="flipCard(-1)">←</button>
-            <button class="card-nav-btn" onclick="flipCard(1)">→</button>
+        <div id="recipeFeed">
+            <div class="loading">Opening recipe box...</div>
         </div>
     </div>
 
-    <!-- SHOPPING TAB -->
     <div id="tab-shopping" class="tab-content">
         <h2 style="font-family:var(--font-head); color:var(--kitchen-mint-dark); margin-bottom:15px;">Shopping List</h2>
         
-        <button class="ai-sort-btn" onclick="sortList()">
+        <button class="ai-sort-btn" onclick="aiSortList()">
             ✨ Tidy Up List (AI)
         </button>
 
@@ -406,7 +288,6 @@
         </div>
     </div>
 
-    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
         <button class="nav-btn active" onclick="switchTab('planner')" id="nav-planner">
             <span class="nav-icon">📅</span> Plan
@@ -423,7 +304,6 @@
         <button class="nav-btn" style="opacity:0; pointer-events:none;"><span>⚙️</span></button>
     </div>
 
-    <!-- ADD RECIPE MODAL -->
     <div class="modal" id="recipeModal">
         <div class="modal-card">
             <h2 style="font-family:var(--font-head); margin-bottom:15px; color:var(--kitchen-mint);">New Recipe Card</h2>
@@ -438,7 +318,6 @@
         </div>
     </div>
 
-    <!-- TIMER MODAL -->
     <div class="modal" id="timerModal">
         <div class="modal-card" style="text-align:center; border-color:var(--sunflower);">
             <div style="font-family:var(--font-head); font-size:1.5rem; margin-bottom:10px;">Timer</div>
@@ -447,51 +326,40 @@
         </div>
     </div>
 
-    <!-- DAY SELECTOR MODAL -->
     <div class="modal" id="selectorModal">
         <div class="modal-card">
-            <h3 style="font-family:var(--font-head); margin-bottom:15px;">Choose a Day</h3>
+            <h3 style="font-family:var(--font-head); margin-bottom:15px;">Choose a Recipe</h3>
             <div id="selectorList"></div>
             <button onclick="document.getElementById('selectorModal').classList.remove('show')" style="width:100%; padding:15px; background:transparent; border:none; color:var(--text-muted); font-weight:bold; cursor:pointer;">Cancel</button>
         </div>
     </div>
 
-    <!-- EXPANDED RECIPE MODAL -->
-    <div class="modal" id="expandedModal">
-        <div class="modal-card" id="expandedContent"></div>
-    </div>
-
     <script>
         // CONFIG
         const BIN_ID = "6947951243b1c97be9fc48e7"; 
-        const API_KEY = "$2a$10$qZdFvBQfv93zCuJiPDIln.ui9ln3pOufUtcpIivYnUQdJmakpBmWe";
+        const API_KEY = "$2a$10$qZdFvBQfv93zCuJiPDIln.ui9ln3pOufUtcpIivYnUQdJmakpBmWe"; 
         const GEMINI_API_KEY = "AIzaSyBBg05zDMqhPkNiPUsRnZszHwWUk6q8R0M"; 
         
         let allRecipes = [];
-        let filteredRecipes = [];
-        let currentCardIndex = 0;
-        let isAnimating = false;
         let shoppingList = JSON.parse(localStorage.getItem('micaShopList') || '[]');
         let mealPlan = JSON.parse(localStorage.getItem('micaMealPlan') || '{}');
         let currentFilter = 'All';
         let pantryStaples = ['salt', 'pepper', 'water', 'olive oil', 'butter', 'flour', 'sugar', 'oil', 'garlic', 'onion'];
-        let pendingMealDay = null;
+        let pendingMealDay = null; // Which day we are currently adding a recipe to
 
-        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']; // M-F only
+        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
         async function init() {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
                 const data = await res.json();
                 allRecipes = Array.isArray(data.record) ? data.record : [];
-                filteredRecipes = [...allRecipes];
-                populateTagDropdown();
-                renderCardStack();
+                renderRecipes();
                 renderPlanner();
                 renderShopping();
                 renderPantry();
             } catch(e) { 
-                document.getElementById('cardStack').innerHTML = "<div class='loading'>Could not load recipes.</div>";
+                document.getElementById('recipeFeed').innerHTML = "<div class='loading'>Could not load recipes.<br>Check internet?</div>";
             }
         }
 
@@ -503,158 +371,79 @@
             const navBtn = document.getElementById('nav-' + tabId);
             if(navBtn) navBtn.classList.add('active');
             
+            // Clear pending meal state if we leave recipes tab
             if(tabId !== 'recipes' && pendingMealDay) {
                 pendingMealDay = null;
                 renderMealSelectionHint();
             }
         }
 
-        // --- CARD STACK RECIPES ---
-        function renderCardStack() {
-            const container = document.getElementById('cardStack');
+        // --- RECIPES ---
+        function renderRecipes() {
+            const container = document.getElementById('recipeFeed');
             container.innerHTML = '';
-            
-            if (filteredRecipes.length === 0) {
-                container.innerHTML = '<div class="loading">No recipes found</div>';
-                document.getElementById('cardCounter').textContent = '';
-                return;
+            let filtered = allRecipes;
+            if (currentFilter !== 'All') {
+                if (currentFilter === 'Favorites') filtered = allRecipes; // Simplified
+                else filtered = allRecipes.filter(r => r.tags && r.tags.map(t=>t.toLowerCase()).includes(currentFilter.toLowerCase()));
             }
 
-            // Show up to 3 cards in stack
-            for (let i = 0; i < Math.min(3, filteredRecipes.length); i++) {
-                const recipeIdx = (currentCardIndex + i) % filteredRecipes.length;
-                const r = filteredRecipes[recipeIdx];
-                const card = document.createElement('div');
-                card.className = 'recipe-card';
-                card.dataset.pos = i === 0 ? '0' : i === 1 ? '1' : '2';
-                card.onclick = () => { if (i === 0) expandRecipe(r); };
+            filtered.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'recipe-card';
                 
-                const ingPreview = r.ingredients.slice(0, 4).join(', ') + (r.ingredients.length > 4 ? '...' : '');
-                
-                card.innerHTML = `
-                    <div class="card-content">
-                        <div class="card-title">${r.title}</div>
-                        <div class="card-meta">${r.tags ? r.tags.join(' • ') : ''}</div>
-                        <div class="card-section-title">Ingredients</div>
-                        <div class="card-list">${ingPreview}</div>
+                const instHtml = r.instructions.map((step, i) => {
+                    const timeMatch = step.match(/(\d+)\s*(min|minute|hour)/i);
+                    let timerBtn = '';
+                    if(timeMatch) {
+                        const mins = parseInt(timeMatch[1]) * (timeMatch[2].startsWith('h') ? 60 : 1);
+                        timerBtn = `<button class="timer-btn" onclick="startTimer(${mins})">⏱ ${timeMatch[0]}</button>`;
+                    }
+                    return `<div class="instruction-step"><div class="step-num">${i+1}</div><div class="step-content">${step} ${timerBtn}</div></div>`;
+                }).join('');
+
+                // Add to Meal Plan Button (Changes based on context)
+                let planBtn = `<button class="pill-btn btn-sunflower" onclick="startMealPlanSelection('${r.id}')">📅 Plan</button>`;
+                if (pendingMealDay) {
+                    planBtn = `<button class="pill-btn btn-sunflower" onclick="addRecipeToDay('${pendingMealDay}', '${r.id}')">➕ Add to ${pendingMealDay}</button>`;
+                }
+
+                div.innerHTML = `
+                    ${r.photo ? `<div class="recipe-image-container"><img src="${r.photo}" class="recipe-photo"></div>` : ''}
+                    <div class="card-body">
+                        <div class="recipe-title">${r.title}</div>
+                        <div class="recipe-desc">${r.description || ''}</div>
+                        <div class="controls-row" style="margin-bottom:5px;">
+                            ${planBtn}
+                            <button class="pill-btn" onclick="addToShop('${r.title}')">🛒 Shop</button>
+                        </div>
+                        <div class="section-header">Ingredients</div>
+                        ${r.ingredients.map(ing => `<div class="ingredient-row" onclick="this.classList.toggle('checked')"><div class="checkbox"></div><div>${ing}</div></div>`).join('')}
+                        <div class="section-header">Instructions</div>
+                        ${instHtml}
                     </div>
                 `;
-                container.appendChild(card);
-            }
-
-            document.getElementById('cardCounter').textContent = `${currentCardIndex + 1} of ${filteredRecipes.length}`;
-            renderMealSelectionHint();
-        }
-
-        function flipCard(dir) {
-            if (isAnimating || filteredRecipes.length < 2) return;
-            isAnimating = true;
-            
-            const frontCard = document.querySelector('.recipe-card[data-pos="0"]');
-            
-            if (dir === 1 && frontCard) {
-                frontCard.classList.add('flipping-out');
-                setTimeout(() => {
-                    currentCardIndex = (currentCardIndex + 1) % filteredRecipes.length;
-                    renderCardStack();
-                    isAnimating = false;
-                }, 350);
-            } else if (dir === -1) {
-                currentCardIndex = (currentCardIndex - 1 + filteredRecipes.length) % filteredRecipes.length;
-                renderCardStack();
-                const newFront = document.querySelector('.recipe-card[data-pos="0"]');
-                if (newFront) {
-                    newFront.classList.add('flipping-in');
-                    setTimeout(() => {
-                        newFront.classList.remove('flipping-in');
-                        isAnimating = false;
-                    }, 350);
-                } else {
-                    isAnimating = false;
-                }
-            }
-        }
-
-        function expandRecipe(r) {
-            const content = document.getElementById('expandedContent');
-            const recipeId = r.title; // Use title as ID since recipes don't have id field
-            
-            let planBtn = `<button class="pill-btn btn-sunflower" onclick="startMealPlanSelection('${recipeId.replace(/'/g, "\\'")}')" style="flex:1;">📅 Add to Plan</button>`;
-            if (pendingMealDay) {
-                planBtn = `<button class="pill-btn btn-sunflower" onclick="addRecipeToDay('${pendingMealDay}', '${recipeId.replace(/'/g, "\\'")}')" style="flex:1;">➕ Add to ${pendingMealDay}</button>`;
-            }
-            
-            const recipeTitle = r.title.replace(/'/g, "\\'");
-            
-            content.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:15px;">
-                    <div class="card-title" style="font-size:1.8rem;">${r.title}</div>
-                    <button onclick="document.getElementById('expandedModal').classList.remove('show')" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>
-                </div>
-                <div class="card-meta">${r.tags ? r.tags.join(' • ') : ''}</div>
-                ${r.description ? `<p style="font-style:italic; color:#666; margin:10px 0;">${r.description}</p>` : ''}
-                
-                <div class="card-section-title">Ingredients</div>
-                <ul class="card-list">${r.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>
-                
-                <div class="card-section-title">Instructions</div>
-                <ol class="card-list">${r.instructions.map(inst => `<li style="margin-bottom:8px;">${inst}</li>`).join('')}</ol>
-                
-                <div class="card-actions">
-                    ${planBtn}
-                    <button class="pill-btn" onclick="addToShop('${recipeTitle}')" style="flex:1;">🛒 Shop</button>
-                </div>
-            `;
-            document.getElementById('expandedModal').classList.add('show');
+                container.appendChild(div);
+            });
         }
 
         function setFilter(tag) {
             currentFilter = tag;
-            
-            if (tag === 'All') {
-                filteredRecipes = [...allRecipes];
-            } else {
-                filteredRecipes = allRecipes.filter(r => r.tags && r.tags.map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
-            }
-            currentCardIndex = 0;
-            renderCardStack();
-        }
-
-        function populateTagDropdown() {
-            const dropdown = document.getElementById('tagFilter');
-            const allTags = new Set();
-            allRecipes.forEach(r => {
-                if (r.tags) {
-                    r.tags.forEach(t => allTags.add(t));
-                }
-            });
-            
-            // Sort tags alphabetically
-            const sortedTags = Array.from(allTags).sort();
-            
-            dropdown.innerHTML = '<option value="All">All Recipes</option>';
-            sortedTags.forEach(tag => {
-                const option = document.createElement('option');
-                option.value = tag;
-                option.textContent = tag.charAt(0).toUpperCase() + tag.slice(1);
-                dropdown.appendChild(option);
-            });
+            document.querySelectorAll('.controls-row .pill-btn').forEach(b => b.classList.remove('active'));
+            if(event.target.id !== 'btnAll') event.target.classList.add('active');
+            else document.getElementById('btnAll').classList.add('active');
+            renderRecipes();
         }
 
         // --- MEAL PLANNER ---
         function renderPlanner() {
             const grid = document.getElementById('plannerGrid');
             grid.innerHTML = DAYS.map(day => {
-                const recipeIds = mealPlan[day] || [];
-                
-                const recipesHtml = recipeIds.map((rTitle, idx) => {
-                    const r = allRecipes.find(x => x.title === rTitle);
-                    if (r) {
-                        return `<div class="meal-chip">${r.title} <button onclick="removeMeal('${day}', ${idx})">×</button></div>`;
-                    } else {
-                        return '';
-                    }
-                }).filter(x => x).join('');
+                const recipes = mealPlan[day] || [];
+                const recipesHtml = recipes.map((rId, idx) => {
+                    const r = allRecipes.find(x => x.id === rId);
+                    return r ? `<div class="meal-chip">${r.title} <button onclick="removeMeal('${day}', ${idx})">×</button></div>` : '';
+                }).join('');
                 
                 return `
                     <div class="meal-day-card">
@@ -672,10 +461,11 @@
             pendingMealDay = day;
             switchTab('recipes');
             renderMealSelectionHint();
-            renderCardStack();
         }
 
         function startMealPlanSelection(recipeId) {
+            // User clicked "Plan" on a recipe without picking a day first
+            // Show modal to pick day
             const list = document.getElementById('selectorList');
             list.innerHTML = DAYS.map(day => 
                 `<div class="modal-list-item" onclick="addRecipeToDay('${day}', '${recipeId}')">📅 ${day}</div>`
@@ -687,16 +477,15 @@
             if (!mealPlan[day]) mealPlan[day] = [];
             mealPlan[day].push(recipeId);
             localStorage.setItem('micaMealPlan', JSON.stringify(mealPlan));
-            
             document.getElementById('selectorModal').classList.remove('show');
-            document.getElementById('expandedModal').classList.remove('show');
             
+            // Reset state
             pendingMealDay = null;
             renderMealSelectionHint();
-            renderCardStack();
-            renderPlanner();
             
-            switchTab('planner');
+            // Feedback
+            alert(`Added to ${day}!`);
+            renderPlanner();
         }
 
         function removeMeal(day, idx) {
@@ -716,12 +505,12 @@
             } else {
                 hintEl.innerHTML = '';
             }
+            renderRecipes(); // Re-render to update buttons
         }
 
         function cancelSelection() {
             pendingMealDay = null;
             renderMealSelectionHint();
-            renderCardStack();
         }
 
         function clearMealPlan() {
@@ -734,8 +523,8 @@
 
         function generateListFromPlan() {
             let count = 0;
-            Object.values(mealPlan).flat().forEach(rTitle => {
-                const r = allRecipes.find(x => x.title === rTitle);
+            Object.values(mealPlan).flat().forEach(rId => {
+                const r = allRecipes.find(x => x.id === rId);
                 if (r) {
                     r.ingredients.forEach(ing => {
                         if (!shouldSkipItem(ing)) {
@@ -768,10 +557,10 @@
                 html += `<div class="shopping-header">${aisle}</div>`;
                 items.forEach((item) => {
                     html += `
-                        <div class="ingredient-row ${item.checked ? 'checked' : ''}" onclick="toggleShopItem('${item.text.replace(/'/g, "\\'")}')">
+                        <div class="ingredient-row ${item.checked ? 'checked' : ''}" onclick="toggleShopItem('${item.text}')" style="background:var(--card-bg); padding:12px; border-radius:8px; margin-bottom:5px; border:1px solid #eee;">
                             <div class="checkbox"></div>
                             <div style="flex:1">${item.text}</div>
-                            <button onclick="event.stopPropagation(); removeShopItem('${item.text.replace(/'/g, "\\'")}')" style="background:none; border:none; color:#e76f51; font-weight:bold; padding:5px;">✕</button>
+                            <button onclick="removeShopItem('${item.text}')" style="background:none; border:none; color:#e76f51; font-weight:bold; padding:5px;">✕</button>
                         </div>`;
                 });
             }
@@ -790,7 +579,6 @@
                 }
             });
             renderShopping();
-            document.getElementById('expandedModal').classList.remove('show');
             alert(`Added ${count} items.`);
         }
 
@@ -837,50 +625,51 @@
             ).join('');
         }
 
-        // --- AI SORT (Gemini) ---
-        async function sortList() {
+        // --- AI SORT ---
+        async function aiSortList() {
             const btn = document.querySelector('.ai-sort-btn');
             const originalText = btn.innerHTML;
             btn.innerHTML = "🤖 Organizing...";
             
-            const ingredients = shoppingList.map(i => i.text).join("\n");
-            const promptText = "You are a grocery list organizer. Take this shopping list and:\n1. Combine similar/duplicate items intelligently (e.g., \"2 cups flour\" + \"1 cup flour\" = \"3 cups flour\", \"onion\" + \"1 onion, diced\" = \"2 onions\")\n2. Remove non-ingredients (like \"--- METHOD ---\", \"to taste\", \"for garnish\", section headers)\n3. Categorize into store aisles: Produce, Meat & Seafood, Dairy, Bakery, Pantry, Frozen, Canned Goods, Condiments\n4. Be smart: onion powder = Pantry, fresh onion = Produce, canned beans = Canned Goods\n\nReturn ONLY valid JSON, no markdown, no explanation:\n{\"Produce\": [\"item1\"], \"Meat & Seafood\": [], \"Dairy\": [], \"Pantry\": [], \"Canned Goods\": [], \"Condiments\": [], \"Bakery\": [], \"Frozen\": []}\n\nShopping list:\n" + ingredients;
+            const ingredients = shoppingList.map(i => i.text).join(", ");
+            const promptText = `
+                I have a grocery list. 
+                1. Remove items that are not food ingredients (like "salt to taste", "method", "garnish"). 
+                2. Combine duplicates.
+                3. Categorize into aisles: Produce, Meat, Dairy, Bakery, Pantry, Frozen.
+                4. Return ONLY a JSON object: { "Produce": ["item", "item"], "Dairy": [...] }
+                List: ${ingredients}
+            `;
 
             try {
-                const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
                 });
                 
                 const data = await response.json();
-                
-                if (data.error) {
-                    if (data.error.message.includes('quota')) {
-                        throw new Error('API quota exceeded. Try again tomorrow or organize manually.');
-                    }
-                    throw new Error(data.error.message || 'API Error');
-                }
-                
                 let rawText = data.candidates[0].content.parts[0].text;
+                // Fix for markdown code blocks
                 rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
                 const sorted = JSON.parse(rawText);
 
                 shoppingList = [];
                 for (const [aisle, items] of Object.entries(sorted)) {
-                    if (items && items.length > 0) {
-                        items.forEach(item => {
-                            shoppingList.push({ text: item, checked: false, aisle: aisle });
-                        });
-                    }
+                    items.forEach(item => {
+                        shoppingList.push({ text: item, checked: false, aisle: aisle });
+                    });
                 }
                 renderShopping();
-                btn.innerHTML = "✨ Organized!";
+                btn.innerHTML = "✨ Tidy!";
                 setTimeout(() => btn.innerHTML = originalText, 2000);
 
             } catch (e) {
-                console.error('AI Sort Error:', e);
-                alert("AI Sort: " + e.message);
+                console.error(e);
+                alert("AI Sort failed (Check console). Using internal sorter.");
+                // Fallback to internal sort
+                shoppingList.forEach(item => item.aisle = guessAisle(item.text));
+                renderShopping();
                 btn.innerHTML = originalText;
             }
         }
@@ -904,7 +693,7 @@
                 updateDisplay(seconds);
                 if (seconds <= 0) {
                     clearInterval(timerInt);
-                    navigator.vibrate && navigator.vibrate([500, 500, 500]);
+                    navigator.vibrate([500, 500, 500]);
                     document.getElementById('timerDisplay').style.color = 'red';
                     document.getElementById('timerDisplay').innerText = "DONE!";
                 }
@@ -924,9 +713,8 @@
         }
 
         function surpriseMe() {
-            if (filteredRecipes.length === 0) return;
-            currentCardIndex = Math.floor(Math.random() * filteredRecipes.length);
-            renderCardStack();
+            const random = allRecipes[Math.floor(Math.random() * allRecipes.length)];
+            if(random) alert(`How about cooking: ${random.title}?`);
         }
 
         function openAddModal() { document.getElementById('recipeModal').classList.add('show'); }
@@ -943,7 +731,6 @@
                 photo: ""
             };
             allRecipes.push(newRecipe);
-            filteredRecipes = [...allRecipes];
             
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
@@ -956,27 +743,11 @@
                     body: JSON.stringify(allRecipes)
                 });
                 document.getElementById('recipeModal').classList.remove('show');
-                renderCardStack();
+                renderRecipes();
                 e.target.reset();
             } catch(e) { alert("Save failed"); }
             btn.innerText = originalText;
         }
-
-        // Touch swipe support
-        let touchStartX = 0;
-        document.addEventListener('touchstart', e => {
-            if (document.getElementById('tab-recipes').classList.contains('active')) {
-                touchStartX = e.touches[0].clientX;
-            }
-        });
-        document.addEventListener('touchend', e => {
-            if (document.getElementById('tab-recipes').classList.contains('active')) {
-                const diff = e.changedTouches[0].clientX - touchStartX;
-                if (Math.abs(diff) > 50) {
-                    flipCard(diff > 0 ? -1 : 1);
-                }
-            }
-        });
 
         init();
     </script>
