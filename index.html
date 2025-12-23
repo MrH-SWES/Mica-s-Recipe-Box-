@@ -224,6 +224,8 @@
         .meal-day-name { font-family: var(--font-head); font-size: 1.2rem; color: var(--kitchen-mint-dark); }
         .add-meal-btn { background: var(--sunflower); border: none; border-radius: 20px; padding: 5px 12px; font-weight: bold; font-size: 0.8rem; cursor: pointer; color: #333; }
         .meal-chip { display: flex; justify-content: space-between; align-items: center; background: rgba(120, 192, 168, 0.15); padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; font-size: 0.9rem; }
+        .meal-chip-title { cursor: pointer; flex: 1; }
+        .meal-chip-title:hover { text-decoration: underline; color: var(--kitchen-mint-dark); }
         .meal-chip button { background: none; border: none; color: #e76f51; font-weight: bold; cursor: pointer; font-size: 1.1rem;}
 
         /* === SHOPPING === */
@@ -401,6 +403,29 @@
             padding: 8px 0;
             border-bottom: 1px dashed rgba(0,0,0,0.1);
             font-size: 0.95rem;
+        }
+        .step-ingredients {
+            background: rgba(244, 196, 48, 0.15);
+            border: 1px solid var(--sunflower);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+        }
+        .step-ingredients-label {
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            color: var(--sunflower-dark);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        body.cook-mode-active .step-ingredients-label {
+            color: var(--sunflower);
+        }
+        .step-ingredient-item {
+            font-size: 0.95rem;
+            padding: 4px 0;
+            color: var(--text-dark);
         }
     </style>
 </head>
@@ -775,6 +800,11 @@
             document.getElementById('expandedModal').classList.add('show');
         }
 
+        function expandRecipeByTitle(title) {
+            const r = allRecipes.find(x => x.title === title);
+            if (r) expandRecipe(r);
+        }
+
         // --- COOK MODE ---
         function openCookMode(recipeTitle) {
             cookModeRecipe = allRecipes.find(r => r.title === recipeTitle);
@@ -794,6 +824,40 @@
             }
             
             renderCookMode();
+        }
+
+        function getIngredientsForStep(recipe, stepIndex) {
+            const step = recipe.instructions[stepIndex].toLowerCase();
+            const matchedIngredients = [];
+            
+            recipe.ingredients.forEach(ing => {
+                // Skip section headers
+                if (ing.startsWith('---') || ing.includes('METHOD') || ing.includes('EQUIPMENT')) return;
+                
+                // Extract the main ingredient name (remove quantities and prep instructions)
+                const ingLower = ing.toLowerCase();
+                // Get words that might be the ingredient name (skip common measurements)
+                const skipWords = ['cup', 'cups', 'tbsp', 'tsp', 'tablespoon', 'teaspoon', 'oz', 'ounce', 'lb', 'pound', 'g', 'kg', 'ml', 'liter', 'pinch', 'dash', 'to', 'taste', 'large', 'medium', 'small', 'fresh', 'dried', 'chopped', 'diced', 'minced', 'sliced', 'optional', 'or', 'and', 'of', 'a', 'an', 'the', 'for', 'about'];
+                
+                // Extract potential ingredient keywords
+                const words = ingLower.replace(/[,()]/g, ' ').split(/\s+/).filter(w => 
+                    w.length > 2 && !skipWords.includes(w) && !/^\d/.test(w) && !/^[\d\/]+$/.test(w)
+                );
+                
+                // Check if any ingredient word appears in the step
+                const isMatch = words.some(word => {
+                    // Handle plurals loosely
+                    const singular = word.replace(/s$/, '');
+                    return step.includes(word) || step.includes(singular) || 
+                           step.includes(word + 's') || step.includes(word + 'es');
+                });
+                
+                if (isMatch) {
+                    matchedIngredients.push(ing);
+                }
+            });
+            
+            return matchedIngredients;
         }
 
         function renderCookMode() {
@@ -827,7 +891,17 @@
             if (cookModeView === 'steps') {
                 // Step-by-step view
                 const currentInstruction = r.instructions[cookModeStep];
+                const stepIngredients = getIngredientsForStep(r, cookModeStep);
+                
+                const stepIngredientsHtml = stepIngredients.length > 0 
+                    ? `<div class="step-ingredients">
+                         <div class="step-ingredients-label">For this step:</div>
+                         ${stepIngredients.map(ing => `<div class="step-ingredient-item">• ${ing}</div>`).join('')}
+                       </div>`
+                    : '';
+                
                 mainContent = `
+                    ${stepIngredientsHtml}
                     <div class="cook-step-container">
                         <div class="cook-step-number">Step ${cookModeStep + 1} of ${totalSteps}</div>
                         <div class="cook-step-text">${currentInstruction}</div>
@@ -894,7 +968,7 @@
                 const recipesHtml = recipeIds.map((rTitle, idx) => {
                     const r = allRecipes.find(x => x.title === rTitle);
                     if (r) {
-                        return `<div class="meal-chip">${r.title} <button onclick="removeMeal('${day}', ${idx})">×</button></div>`;
+                        return `<div class="meal-chip"><span class="meal-chip-title" onclick="expandRecipeByTitle('${r.title.replace(/'/g, "\\'")}')">${r.title}</span> <button onclick="removeMeal('${day}', ${idx})">×</button></div>`;
                     }
                     return '';
                 }).filter(x => x).join('');
