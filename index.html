@@ -1080,7 +1080,40 @@
 
             const ingredientList = ingredients.join("\n");
             
-            const promptText = "You are a smart grocery list generator. I have ingredients from multiple recipes. Your job is to:\n\n1. PARSE each ingredient to extract: the item name, quantity, and unit\n2. COMBINE similar items (e.g., '2 cups flour' + '1 cup flour' = '3 cups flour'; '1 onion, diced' + '1/2 onion, sliced' = '1.5 onions')\n3. CATEGORIZE into grocery store sections\n4. CLEAN UP: remove prep instructions (diced, minced, chopped), keep only what to buy\n\nReturn ONLY valid JSON, no markdown:\n{\"Produce\": [{\"item\": \"onions\", \"qty\": \"2\"}], \"Meat & Seafood\": [], \"Dairy\": [], \"Pantry\": [], \"Canned Goods\": [], \"Condiments\": [], \"Spices\": [], \"Bakery\": [], \"Frozen\": []}\n\nIngredients:\n" + ingredientList;
+            const promptText = `You are a smart grocery shopping assistant. Convert recipe ingredients into a practical shopping list.
+
+CRITICAL RULES:
+1. THINK LIKE A SHOPPER - use quantities that match how items are actually sold:
+   - Celery: sold by the bunch (e.g., "1 bunch celery (need 5 ribs)")
+   - Herbs: sold by the bunch (e.g., "1 bunch parsley")
+   - Green onions: sold by the bunch (e.g., "1 bunch green onions")
+   - Garlic: sold by the head (e.g., "1 head garlic")
+   - Lemons/limes: sold individually (e.g., "2 lemons")
+   - Canned goods: by the can (e.g., "2 cans garbanzo beans (15 oz)")
+   - Meat: by weight or package (e.g., "1 lb chicken breast")
+
+2. OMIT PANTRY STAPLES that most kitchens already have:
+   - Water (never include!)
+   - Salt, black pepper (only include unusual spices)
+   - Cooking oil, olive oil (unless large quantity needed)
+   - Basic dried spices people likely own
+
+3. COMBINE DUPLICATES intelligently:
+   - Same item from multiple recipes = one entry with total
+   - If recipe needs "2 cups" of something sold by unit, convert (e.g., "1 pint heavy cream")
+
+4. CATEGORIZE into grocery aisles:
+   - Produce, Meat & Seafood, Dairy, Pantry, Canned Goods, Condiments, Spices, Bakery, Frozen, Deli
+
+5. FORMAT the qty field as a readable shopping quantity:
+   - Good: "1 bunch", "2 cans", "1 lb", "1 jar", "2 medium"
+   - Bad: "5", "0.33 bunch", "1 tbsp", "3"
+
+Return ONLY valid JSON, no markdown:
+{"Produce": [{"item": "celery", "qty": "1 bunch (need 5 ribs)"}], "Meat & Seafood": [], "Dairy": [], "Pantry": [], "Canned Goods": [], "Condiments": [], "Spices": [], "Bakery": [], "Frozen": [], "Deli": []}
+
+Ingredients:
+` + ingredientList;
 
             try {
                 const response = await fetch(AI_API_URL, {
