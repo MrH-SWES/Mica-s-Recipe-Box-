@@ -1084,29 +1084,30 @@
 
 CRITICAL RULES:
 1. THINK LIKE A SHOPPER - use quantities that match how items are actually sold:
-   - Celery: sold by the bunch (e.g., "1 bunch celery (need 5 ribs)")
+   - Celery: sold by the bunch (e.g., "1 bunch (need 5 ribs)")
    - Herbs: sold by the bunch (e.g., "1 bunch parsley")
    - Green onions: sold by the bunch (e.g., "1 bunch green onions")
    - Garlic: sold by the head (e.g., "1 head garlic")
    - Lemons/limes: sold individually (e.g., "2 lemons")
-   - Canned goods: by the can (e.g., "2 cans garbanzo beans (15 oz)")
-   - Meat: by weight or package (e.g., "1 lb chicken breast")
+   - Canned goods: by the can (e.g., "2 cans (15 oz)")
+   - Meat: by weight or package (e.g., "1 lb")
+   - Vinegars: sold by bottle (e.g., "1 bottle (need 3 tbsp)")
+   - Condiments (mustard, mayo, etc): by jar (e.g., "1 jar (need 2 tbsp)")
+   - Sauces (soy, fish, hot sauce): by bottle (e.g., "1 bottle (need 2 tbsp)")
+   - Grains (rice, quinoa, farro, spelt): by bag (e.g., "1 bag (need 1 cup)")
+   - Broth/stock: by carton (e.g., "1 carton (32 oz)")
 
-2. OMIT PANTRY STAPLES that most kitchens already have:
-   - Water (never include!)
-   - Salt, black pepper (only include unusual spices)
-   - Cooking oil, olive oil (unless large quantity needed)
-   - Basic dried spices people likely own
+2. OMIT PANTRY STAPLES most kitchens have - DO NOT INCLUDE:
+   - Water (NEVER!)
+   - Salt, black pepper
+   - Cooking oil, olive oil, vegetable oil
 
-3. COMBINE DUPLICATES intelligently:
-   - Same item from multiple recipes = one entry with total
-   - If recipe needs "2 cups" of something sold by unit, convert (e.g., "1 pint heavy cream")
+3. COMBINE DUPLICATES: same item from multiple recipes = one entry with total
 
-4. CATEGORIZE into grocery aisles:
-   - Produce, Meat & Seafood, Dairy, Pantry, Canned Goods, Condiments, Spices, Bakery, Frozen, Deli
+4. CATEGORIZE: Produce, Meat & Seafood, Dairy, Pantry, Canned Goods, Condiments, Spices, Bakery, Frozen, Deli
 
-5. FORMAT the qty field as a readable shopping quantity:
-   - Good: "1 bunch", "2 cans", "1 lb", "1 jar", "2 medium"
+5. FORMAT qty as a shopping quantity:
+   - Good: "1 bunch (need 5 ribs)", "2 cans", "1 jar (need 2 tbsp)", "1 bottle (need 3 tbsp)"
    - Bad: "5", "0.33 bunch", "1 tbsp", "3"
 
 Return ONLY valid JSON, no markdown:
